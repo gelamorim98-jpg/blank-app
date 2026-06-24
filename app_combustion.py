@@ -1,8 +1,7 @@
 import streamlit as st
 import math
 
-#TÍTULO DA PÁGINA
-
+# TÍTULO DA PÁGINA
 st.set_page_config(
     page_title="Combustão - Estequiometria e Equilíbrio Químico",
     layout="wide"
@@ -14,7 +13,6 @@ st.markdown(
 )
 
 # BOTÕES DE NAVEGAÇÃO
-
 botao_esteq = st.button("📁 Balanço Estequiométrico", use_container_width=True)
 botao_equil = st.button("📁 Equilíbrio Químico", use_container_width=True)
 
@@ -24,26 +22,29 @@ st.divider()
 
 if botao_esteq:
     st.header("📁 Balanço Estequiométrico")
-   
+    
     col1, col2 = st.columns(2)
     
     with col1:
-        x = st.number_input("Número de Carbonos:", min_value=1, value=1, step=1)
+        x = st.number_input("Número de Carbonos:", min_value=1, value=1, step=1, key="x_carbonos")
     with col2:
-        y = st.number_input("Número de Hidrogênios:", min_value=1, value=4, step=1)
+        y = st.number_input("Número de Hidrogênios:", min_value=1, value=4, step=1, key="y_hidrogenios")
     
     st.write(f"**Combustível:** C<sub>{x}</sub>H<sub>{y}</sub>", unsafe_allow_html=True)
     
+    # Usando um key diferente para evitar conflito com o outro botão
     if st.button("Calcular Estequiometria", key="calc_esteq"):
         
+        # Cálculos
         O2 = x + y/4
         ar_teorico = O2 / 0.21
         CO2 = x
         H2O = y/2
         
+        # Exibir resultados
         st.subheader("Resultados")
         
-        st.write(f"**Combustível:** C{x}H{y}")
+        st.write(f"**Combustível:** C<sub>{x}</sub>H<sub>{y}</sub>", unsafe_allow_html=True)
         st.write(f"**O₂ teórico:** {O2:.2f} mol")
         st.write(f"**Ar teórico:** {ar_teorico:.2f} mol")
         st.write(f"**CO₂ produzido:** {CO2:.2f} mol")
@@ -55,10 +56,10 @@ if botao_esteq:
 if botao_equil:
     st.header("⚖️ Equilíbrio Químico")
     
-    # Seu código original
     combustivel = st.selectbox(
         "Selecione o combustível:",
-        ["Metano (CH₄)", "Propano (C₃H₈)", "Octano (C₈H₁₈)"]
+        ["Metano (CH₄)", "Propano (C₃H₈)", "Octano (C₈H₁₈)"],
+        key="combustivel_equilibrio"
     )
     
     if combustivel == "Metano (CH₄)":
@@ -71,7 +72,7 @@ if botao_equil:
         x = 8
         y = 18
     
-    if st.button("Calcular Equilíbrio"):
+    if st.button("Calcular Equilíbrio", key="calc_equil"):
         
         # Cálculos
         O2 = x + y/4
