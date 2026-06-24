@@ -1,6 +1,8 @@
 import streamlit as st
 import math
 
+#TÍTULO DA PÁGINA
+
 st.set_page_config(
     page_title="Combustão - Estequiometria e Equilíbrio Químico",
     layout="wide"
@@ -13,13 +15,8 @@ st.markdown(
 
 # BOTÕES DE NAVEGAÇÃO
 
-col1, col2 = st.columns(2)
-
-with col1:
-    botao_esteq = st.button("📊 Balanço Estequiométrico", use_container_width=True)
-
-with col2:
-    botao_equil = st.button("⚖️ Equilíbrio Químico", use_container_width=True)
+botao_esteq = st.button("📊 Balanço Estequiométrico", use_container_width=True)
+botao_equil = st.button("⚖️ Equilíbrio Químico", use_container_width=True)
 
 st.divider()
 
