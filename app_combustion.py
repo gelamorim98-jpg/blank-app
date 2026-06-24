@@ -34,7 +34,40 @@ if st.session_state.mostrar_esteq:
         y = st.number_input("Número de Hidrogênios:", min_value=1, value=4, step=1) 
         
     st.write(f"**Combustível:** C<sub>{x}</sub>H<sub>{y}</sub>", unsafe_allow_html=True)
+
+    st.divider()
+    st.markdown("### Condições de Combustão")
     
+    col_ar1, col_ar2 = st.columns(2)
+    
+    with col_ar1:
+        tipo_ar = st.radio(
+            "Tipo de condição:",
+            options=["Excesso de ar", "Deficiência de ar", "Estequiométrico"],
+            index=2,
+            horizontal=True
+        )
+    
+    # Define o valor baseado no tipo selecionado
+    if tipo_ar == "Estequiométrico":
+        valor_padrao = 0
+        step = 1
+        min_valor = 0
+        max_valor = 0
+        label = "0% (ar teórico)"
+    elif tipo_ar == "Excesso de ar":
+        valor_padrao = 20
+        step = 5
+        min_valor = 1
+        max_valor = 200
+        label = "% de excesso de ar"
+    else:  # Deficiência de ar
+        valor_padrao = -20
+        step = 5
+        min_valor = -80
+        max_valor = -1
+        label = "% de deficiência de ar"
+        
     if st.button("Calcular Estequiometria"):
         
         # CÁLCULOS
