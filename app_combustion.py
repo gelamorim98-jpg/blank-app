@@ -24,8 +24,7 @@ st.divider()
 
 if botao_esteq:
     st.header("📁 Balanço Estequiométrico")
-    
-    # Entrada do combustível genérico CxHy
+   
     col1, col2 = st.columns(2)
     
     with col1:
