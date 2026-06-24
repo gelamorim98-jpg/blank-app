@@ -93,45 +93,7 @@ if st.session_state.mostrar_esteq:
         )
         
         st.divider()
-  
-        # COEFICIENTES DA REAÇÃO
-       
-        st.markdown("### 📋 Coeficientes Estequiométricos")
-        
-        col_coef1, col_coef2, col_coef3, col_coef4, col_coef5 = st.columns(5)
-        
-        with col_coef1:
-            st.metric(
-                label="a (O₂)",
-                value=f"{a:.2f}"
-            )
-        
-        with col_coef2:
-            st.metric(
-                label="b (CO₂)",
-                value=f"{b:.2f}"
-            )
-        
-        with col_coef3:
-            st.metric(
-                label="c (H₂O)",
-                value=f"{c:.2f}"
-            )
-        
-        with col_coef4:
-            st.metric(
-                label="d (N₂)",
-                value=f"{d:.2f}"
-            )
-        
-        with col_coef5:
-            st.metric(
-                label="Ar teórico",
-                value=f"{ar_teorico:.2f} mol"
-            )
-        
-        st.divider()
-        
+          
         # AR TEÓRICO (em destaque)
         
         st.markdown("### 🌬️ Ar Teórico")
@@ -158,34 +120,10 @@ if st.session_state.mostrar_esteq:
         
         st.divider()
         
-        # PRODUTOS DA COMBUSTÃO
-       
-        st.markdown("### 🔬 Produtos da Combustão")
-        
-        col_prod1, col_prod2, col_prod3 = st.columns(3)
-        
-        with col_prod1:
-            st.metric(
-                label="CO₂",
-                value=f"{b:.2f} mol"
-            )
-        
-        with col_prod2:
-            st.metric(
-                label="H₂O",
-                value=f"{c:.2f} mol"
-            )
-        
-        with col_prod3:
-            st.metric(
-                label="N₂",
-                value=f"{d:.2f} mol"
-            )
-
 # EQUILÍBRIO QUÍMICO
 
 if st.session_state.mostrar_equil:
-    st.header("⚖️ Equilíbrio Químico")
+    st.header("Equilíbrio Químico")
     
     combustivel = st.selectbox(
         "Selecione o combustível:",
@@ -254,45 +192,7 @@ if st.session_state.mostrar_equil:
         )
         
         st.divider()
-        
-        # COEFICIENTES DA REAÇÃO
-
-        st.markdown("### 📋 Coeficientes Estequiométricos")
-        
-        col_coef1, col_coef2, col_coef3, col_coef4, col_coef5 = st.columns(5)
-        
-        with col_coef1:
-            st.metric(
-                label="a (O₂)",
-                value=f"{a:.2f}"
-            )
-        
-        with col_coef2:
-            st.metric(
-                label="b (CO₂)",
-                value=f"{b:.2f}"
-            )
-        
-        with col_coef3:
-            st.metric(
-                label="c (H₂O)",
-                value=f"{c:.2f}"
-            )
-        
-        with col_coef4:
-            st.metric(
-                label="d (N₂)",
-                value=f"{d:.2f}"
-            )
-        
-        with col_coef5:
-            st.metric(
-                label="Ar teórico",
-                value=f"{ar_teorico:.2f} mol"
-            )
-        
-        st.divider()
-    
+          
         # AR TEÓRICO (em destaque)
         
         st.markdown("### 🌬️ Ar Teórico")
@@ -318,27 +218,3 @@ if st.session_state.mostrar_equil:
             )
         
         st.divider()
-        
-        # PRODUTOS DA COMBUSTÃO
-       
-        st.markdown("### 🔬 Produtos da Combustão")
-        
-        col_prod1, col_prod2, col_prod3 = st.columns(3)
-        
-        with col_prod1:
-            st.metric(
-                label="CO₂",
-                value=f"{b:.2f} mol"
-            )
-        
-        with col_prod2:
-            st.metric(
-                label="H₂O",
-                value=f"{c:.2f} mol"
-            )
-        
-        with col_prod3:
-            st.metric(
-                label="N₂",
-                value=f"{d:.2f} mol"
-            )
