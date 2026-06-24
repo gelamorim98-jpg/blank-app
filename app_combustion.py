@@ -29,11 +29,11 @@ if botao_esteq:
     col1, col2 = st.columns(2)
     
     with col1:
-        x = st.number_input("Número de Carbonos (x)", min_value=1, value=1, step=1)
+        x = st.number_input("Número de Carbonos:", min_value=1, value=1, step=1)
     with col2:
-        y = st.number_input("Número de Hidrogênios (y)", min_value=1, value=4, step=1)
+        y = st.number_input("Número de Hidrogênios:", min_value=1, value=4, step=1)
     
-    st.write(f"**Combustível:** C{x}H{y}")
+    st.write(f"**Combustível:** C<sub>{x}</sub>H<sub>{y}</sub>", unsafe_allow_html=True)
     
     if st.button("Calcular Estequiometria"):
         
