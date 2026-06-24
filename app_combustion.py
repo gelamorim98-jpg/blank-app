@@ -2,15 +2,14 @@ import streamlit as st
 import math
 
 st.set_page_config(
-    page_title="Combustão - Estequiometria e Equilíbrio",
-    page_icon="🔥"
+    page_title="Combustão - Estequiometria e Equilíbrio Químico",
+    layout="wide"
 )
 
-st.title("🔥 Estequiometria e Equilíbrio Químico - Combustão")
+st.title("Estequiometria e Equilíbrio Químico - Combustão")
 
-# ============================================
 # BOTÕES DE NAVEGAÇÃO
-# ============================================
+
 col1, col2 = st.columns(2)
 
 with col1:
