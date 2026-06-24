@@ -2,7 +2,6 @@ import streamlit as st
 import math
 
 # TÍTULO DA PÁGINA
-
 st.set_page_config(
     page_title="Combustão - Estequiometria e Equilíbrio Químico",
     layout="wide"
@@ -14,14 +13,12 @@ st.markdown(
 )
 
 # ARMAZENAMENTO DAS VARIÁVEIS
-
 if "mostrar_esteq" not in st.session_state:
     st.session_state.mostrar_esteq = False
 if "mostrar_equil" not in st.session_state:
     st.session_state.mostrar_equil = False
 
 # BOTÕES DE NAVEGAÇÃO
-
 if st.button("Balanço Estequiométrico", use_container_width=True):
     st.session_state.mostrar_esteq = True
     st.session_state.mostrar_equil = False
@@ -33,7 +30,6 @@ if st.button("Equilíbrio Químico", use_container_width=True):
 st.divider()
 
 # BALANÇO ESTEQUIOMÉTRICO
-
 if st.session_state.mostrar_esteq:
     st.header("Balanço Estequiométrico")
     
@@ -49,7 +45,7 @@ if st.session_state.mostrar_esteq:
     if st.button("Calcular Estequiometria"):
         
         # CÁLCULOS
-        
+        # A reação no formato: CxHy + a(O2 + 3,76N2) → bCO2 + cH2O + dN2
         # a = O₂ necessário
         a = x + y/4
         
@@ -66,22 +62,16 @@ if st.session_state.mostrar_esteq:
         ar_teorico = a * 4.76
         
         # RESULTADOS
-        
         st.divider()
-        
         st.markdown(
             "<h2 style='text-align: center;'>Resultados</h2>",
             unsafe_allow_html=True
         )
-
         st.divider()
         
         st.markdown("### ➡️ Reação Global Balanceada")
-        
-        # Monta a reação no formato: CxHy + a(O2 + 3,76N2) → bCO2 + cH2O + dN2
         reacao = f"C<sub>{x}</sub>H<sub>{y}</sub> + {a:.2f}(O₂ + 3,76 N₂) → {b:.2f} CO₂ + {c:.2f} H₂O + {d:.2f} N₂"
         
-        # Exibe a reação em uma caixa destacada
         st.markdown(
             f"""
             <div style='
@@ -98,33 +88,27 @@ if st.session_state.mostrar_esteq:
             """,
             unsafe_allow_html=True
         )
-        
         st.divider()
           
-        # AR TEÓRICO (em destaque)
+        # AR TEÓRICO
         
         st.markdown("### ➡️ Ar Teórico")
-        
         col_ar1, col_ar2, col_ar3 = st.columns(3)
-        
         with col_ar1:
             st.metric(
                 label="Ar teórico (mol)",
                 value=f"{ar_teorico:.2f} mol"
             )
-        
         with col_ar2:
             st.metric(
                 label="O₂ necessário (mol)",
                 value=f"{a:.2f} mol"
             )
-        
         with col_ar3:
             st.metric(
                 label="N₂ acompanhante (mol)",
                 value=f"{d:.2f} mol"
             )
-        
         st.divider()
         
 # EQUILÍBRIO QUÍMICO
@@ -153,7 +137,6 @@ if st.session_state.mostrar_equil:
     if st.button("Calcular Equilíbrio"):
         
         # CÁLCULOS
-        
         # a = O₂ necessário
         a = x + y/4
         
@@ -166,25 +149,21 @@ if st.session_state.mostrar_equil:
         # d = N₂ (3,76 * a, pois a relação N₂/O₂ = 3,76)
         d = 3.76 * a
         
-        # Ar teórico = a * (1 + 3,76) = a * 4,76
+        # Ar teórico = a * 4,76
         ar_teorico = a * 4.76
         
         # EXIBIR RESULTADOS
-        
         st.divider()
-        
         st.markdown(
             "<h2 style='text-align: center;'>Resultados</h2>",
             unsafe_allow_html=True
         )
-
         st.divider()
     
         # REAÇÃO GLOBAL BALANCEADA 
        
         st.markdown("## ➡️ Reação Global Balanceada")
         
-        # Monta a reação no formato: CxHy + a(O2 + 3,76N2) → bCO2 + cH2O + dN2
         reacao = f"{formula} + {a:.2f}(O₂ + 3,76 N₂) → {b:.2f} CO₂ + {c:.2f} H₂O + {d:.2f} N₂"
         
         st.markdown(
@@ -211,23 +190,19 @@ if st.session_state.mostrar_equil:
         st.markdown("## ➡️ Ar Teórico")
         
         col_ar1, col_ar2, col_ar3 = st.columns(3)
-        
         with col_ar1:
             st.metric(
                 label="Ar teórico (mol)",
                 value=f"{ar_teorico:.2f} mol"
             )
-        
         with col_ar2:
             st.metric(
                 label="O₂ necessário (mol)",
                 value=f"{a:.2f} mol"
             )
-        
         with col_ar3:
             st.metric(
                 label="N₂ acompanhante (mol)",
                 value=f"{d:.2f} mol"
             )
-        
         st.divider()
