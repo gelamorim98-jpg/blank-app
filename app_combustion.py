@@ -17,7 +17,7 @@ if "mostrar_esteq" not in st.session_state:
     st.session_state.mostrar_esteq = False
 
 # BOTÕES DE NAVEGAÇÃO
-#if st.button("Balanço Estequiométrico", use_container_width=True):
+if st.button("Balanço Estequiométrico", use_container_width=True):
     st.session_state.mostrar_esteq = True
     st.session_state.mostrar_equil = False
 st.divider()
