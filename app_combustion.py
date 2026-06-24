@@ -15,18 +15,11 @@ st.markdown(
 # ARMAZENAMENTO DAS VARIÁVEIS
 if "mostrar_esteq" not in st.session_state:
     st.session_state.mostrar_esteq = False
-if "mostrar_equil" not in st.session_state:
-    st.session_state.mostrar_equil = False
 
 # BOTÕES DE NAVEGAÇÃO
 if st.button("Balanço Estequiométrico", use_container_width=True):
     st.session_state.mostrar_esteq = True
     st.session_state.mostrar_equil = False
-
-if st.button("Equilíbrio Químico", use_container_width=True):
-    st.session_state.mostrar_equil = True
-    st.session_state.mostrar_esteq = False
-
 st.divider()
 
 # BALANÇO ESTEQUIOMÉTRICO
