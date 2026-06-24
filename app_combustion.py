@@ -24,7 +24,7 @@ st.divider()
 
 # BALANÇO ESTEQUIOMÉTRICO
 if st.session_state.mostrar_esteq:
-    st.header("Balanço Estequiométrico")
+    #st.header("Balanço Estequiométrico")
     
     col1, col2 = st.columns(2)
     
