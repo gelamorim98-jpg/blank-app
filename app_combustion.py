@@ -69,7 +69,7 @@ if st.session_state.mostrar_esteq:
         
         st.subheader("📊 Resultados")
         
-        st.markdown("###➡️ Reação Global Balanceada")
+        st.markdown(###"➡️ Reação Global Balanceada")
         
         # Monta a reação no formato: CxHy + a(O2 + 3,76N2) → bCO2 + cH2O + dN2
         reacao = f"C<sub>{x}</sub>H<sub>{y}</sub> + {a:.2f}(O₂ + 3,76 N₂) → {b:.2f} CO₂ + {c:.2f} H₂O + {d:.2f} N₂"
