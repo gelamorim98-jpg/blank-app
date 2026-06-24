@@ -69,7 +69,7 @@ if st.session_state.mostrar_esteq:
         
         st.subheader("📊 Resultados")
         
-        st.markdown("➡️ Reação Global Balanceada")
+        st.markdown("##➡️ Reação Global Balanceada")
         
         # Monta a reação no formato: CxHy + a(O2 + 3,76N2) → bCO2 + cH2O + dN2
         reacao = f"C<sub>{x}</sub>H<sub>{y}</sub> + {a:.2f}(O₂ + 3,76 N₂) → {b:.2f} CO₂ + {c:.2f} H₂O + {d:.2f} N₂"
@@ -96,7 +96,7 @@ if st.session_state.mostrar_esteq:
           
         # AR TEÓRICO (em destaque)
         
-        st.markdown(" ➡️ Ar Teórico")
+        st.markdown("##➡️ Ar Teórico")
         
         col_ar1, col_ar2, col_ar3 = st.columns(3)
         
@@ -168,7 +168,7 @@ if st.session_state.mostrar_equil:
     
         # REAÇÃO GLOBAL BALANCEADA 
        
-        st.markdown("### ➡️ Reação Global Balanceada")
+        st.markdown("## ➡️ Reação Global Balanceada")
         
         # Monta a reação no formato: CxHy + a(O2 + 3,76N2) → bCO2 + cH2O + dN2
         reacao = f"{formula} + {a:.2f}(O₂ + 3,76 N₂) → {b:.2f} CO₂ + {c:.2f} H₂O + {d:.2f} N₂"
@@ -194,7 +194,7 @@ if st.session_state.mostrar_equil:
           
         # AR TEÓRICO
         
-        st.markdown("### ➡️ Ar Teórico")
+        st.markdown("## ➡️ Ar Teórico")
         
         col_ar1, col_ar2, col_ar3 = st.columns(3)
         
