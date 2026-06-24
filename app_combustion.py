@@ -12,7 +12,7 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# ARMAZENAMENTO DE DADOS
+# ARMAZENAMENTO DE VARIÁVEIS
 
 if "mostrar_esteq" not in st.session_state:
     st.session_state.mostrar_esteq = False
@@ -21,16 +21,20 @@ if "mostrar_equil" not in st.session_state:
 
 # BOTÕES DE NAVEGAÇÃO
 
-botao_esteq = st.button("📊 Balanço Estequiométrico", use_container_width=True)
-botao_equil = st.button("⚖️ Equilíbrio Químico", use_container_width=True)
+if st.button("Balanço Estequiométrico", use_container_width=True):
+    st.session_state.mostrar_esteq = True
+    st.session_state.mostrar_equil = False
+
+if st.button("Equilíbrio Químico", use_container_width=True):
+    st.session_state.mostrar_equil = True
+    st.session_state.mostrar_esteq = False
 
 st.divider()
 
-# ============================================
 # BALANÇO ESTEQUIOMÉTRICO
-# ============================================
+
 if st.session_state.mostrar_esteq:
-    st.header("📁 Balanço Estequiométrico")
+    st.header("Balanço Estequiométrico")
     
     col1, col2 = st.columns(2)
     
@@ -59,13 +63,12 @@ if st.session_state.mostrar_esteq:
         st.write(f"**Ar teórico:** {ar_teorico:.2f} mol")
         st.write(f"**CO₂ produzido:** {CO2:.2f} mol")
         st.write(f"**H₂O produzida:** {H2O:.2f} mol")
-        st.write(f"**N₂ (do ar):** {N2:.2f} mol")
+        st.write(f"**N₂:** {N2:.2f} mol")
 
-# ============================================
 # EQUILÍBRIO QUÍMICO
-# ============================================
+
 if st.session_state.mostrar_equil:
-    st.header("⚖️ Equilíbrio Químico")
+    st.header("Equilíbrio Químico")
     
     combustivel = st.selectbox(
         "Selecione o combustível:",
@@ -100,4 +103,4 @@ if st.session_state.mostrar_equil:
         st.write(f"**Ar teórico:** {ar_teorico:.2f} mol")
         st.write(f"**CO₂ produzido:** {CO2:.2f} mol")
         st.write(f"**H₂O produzida:** {H2O:.2f} mol")
-        st.write(f"**N₂ (do ar):** {N2:.2f} mol")
+        st.write(f"**N₂:** {N2:.2f} mol")
