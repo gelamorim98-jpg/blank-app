@@ -2,6 +2,7 @@ import streamlit as st
 import math
 
 # TÍTULO DA PÁGINA
+
 st.set_page_config(
     page_title="Combustão - Estequiometria e Equilíbrio Químico",
     layout="wide"
@@ -12,7 +13,7 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# ARMAZENAMENTO DE VARIÁVEIS
+# ARMAZENAMENTO DAS VARIÁVEIS
 
 if "mostrar_esteq" not in st.session_state:
     st.session_state.mostrar_esteq = False
@@ -21,11 +22,11 @@ if "mostrar_equil" not in st.session_state:
 
 # BOTÕES DE NAVEGAÇÃO
 
-if st.button("Balanço Estequiométrico", use_container_width=True):
+if st.button("📁 Balanço Estequiométrico", use_container_width=True):
     st.session_state.mostrar_esteq = True
     st.session_state.mostrar_equil = False
 
-if st.button("Equilíbrio Químico", use_container_width=True):
+if st.button("📁 Equilíbrio Químico", use_container_width=True):
     st.session_state.mostrar_equil = True
     st.session_state.mostrar_esteq = False
 
@@ -47,28 +48,144 @@ if st.session_state.mostrar_esteq:
     
     if st.button("Calcular Estequiometria"):
         
-        # Cálculos
-        O2 = x + y/4
-        ar_teorico = O2 / 0.21
-        CO2 = x
-        H2O = y/2
+        # CÁLCULOS
         
-        # Nitrogênio (N₂) - 79% do ar
-        N2 = ar_teorico * 0.79
+        # a = O₂ necessário
+        a = x + y/4
         
-        st.subheader("Resultados")
+        # b = CO₂ produzido
+        b = x
         
-        st.write(f"**Combustível:** C<sub>{x}</sub>H<sub>{y}</sub>", unsafe_allow_html=True)
-        st.write(f"**O₂ teórico:** {O2:.2f} mol")
-        st.write(f"**Ar teórico:** {ar_teorico:.2f} mol")
-        st.write(f"**CO₂ produzido:** {CO2:.2f} mol")
-        st.write(f"**H₂O produzida:** {H2O:.2f} mol")
-        st.write(f"**N₂:** {N2:.2f} mol")
+        # c = H₂O produzida
+        c = y/2
+        
+        # d = N₂
+        d = 3.76 * a
+        
+        # Ar teórico
+        ar_teorico = a * 4.76
+        
+        # RESULTADOS
+        
+        st.subheader("📊 Resultados")
+        
+        st.markdown("Reação Global Balanceada")
+        
+        # Monta a reação no formato: CxHy + a(O2 + 3,76N2) → bCO2 + cH2O + dN2
+        reacao = f"C<sub>{x}</sub>H<sub>{y}</sub> + {a:.2f}(O₂ + 3,76 N₂) → {b:.2f} CO₂ + {c:.2f} H₂O + {d:.2f} N₂"
+        
+        # Exibe a reação em uma caixa destacada
+        st.markdown(
+            f"""
+            <div style='
+                background-color: #f0f2f6;
+                padding: 20px;
+                border-radius: 10px;
+                border-left: 5px solid #ff4b4b;
+                font-size: 18px;
+                text-align: center;
+                font-family: 'Courier New', monospace;
+            '>
+                <b>{reacao}</b>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+        
+        st.divider()
+  
+        # COEFICIENTES DA REAÇÃO
+       
+        st.markdown("### 📋 Coeficientes Estequiométricos")
+        
+        col_coef1, col_coef2, col_coef3, col_coef4, col_coef5 = st.columns(5)
+        
+        with col_coef1:
+            st.metric(
+                label="a (O₂)",
+                value=f"{a:.2f}"
+            )
+        
+        with col_coef2:
+            st.metric(
+                label="b (CO₂)",
+                value=f"{b:.2f}"
+            )
+        
+        with col_coef3:
+            st.metric(
+                label="c (H₂O)",
+                value=f"{c:.2f}"
+            )
+        
+        with col_coef4:
+            st.metric(
+                label="d (N₂)",
+                value=f"{d:.2f}"
+            )
+        
+        with col_coef5:
+            st.metric(
+                label="Ar teórico",
+                value=f"{ar_teorico:.2f} mol"
+            )
+        
+        st.divider()
+        
+        # AR TEÓRICO (em destaque)
+        
+        st.markdown("### 🌬️ Ar Teórico")
+        
+        col_ar1, col_ar2, col_ar3 = st.columns(3)
+        
+        with col_ar1:
+            st.metric(
+                label="Ar teórico (mol)",
+                value=f"{ar_teorico:.2f} mol"
+            )
+        
+        with col_ar2:
+            st.metric(
+                label="O₂ necessário (mol)",
+                value=f"{a:.2f} mol"
+            )
+        
+        with col_ar3:
+            st.metric(
+                label="N₂ acompanhante (mol)",
+                value=f"{d:.2f} mol"
+            )
+        
+        st.divider()
+        
+        # PRODUTOS DA COMBUSTÃO
+       
+        st.markdown("### 🔬 Produtos da Combustão")
+        
+        col_prod1, col_prod2, col_prod3 = st.columns(3)
+        
+        with col_prod1:
+            st.metric(
+                label="CO₂",
+                value=f"{b:.2f} mol"
+            )
+        
+        with col_prod2:
+            st.metric(
+                label="H₂O",
+                value=f"{c:.2f} mol"
+            )
+        
+        with col_prod3:
+            st.metric(
+                label="N₂",
+                value=f"{d:.2f} mol"
+            )
 
 # EQUILÍBRIO QUÍMICO
 
 if st.session_state.mostrar_equil:
-    st.header("Equilíbrio Químico")
+    st.header("⚖️ Equilíbrio Químico")
     
     combustivel = st.selectbox(
         "Selecione o combustível:",
@@ -78,29 +195,150 @@ if st.session_state.mostrar_equil:
     if combustivel == "Metano (CH₄)":
         x = 1
         y = 4
+        formula = "CH₄"
     elif combustivel == "Propano (C₃H₈)":
         x = 3
         y = 8
+        formula = "C₃H₈"
     elif combustivel == "Octano (C₈H₁₈)":
         x = 8
         y = 18
+        formula = "C₈H₁₈"
     
     if st.button("Calcular Equilíbrio"):
         
-        # Cálculos
-        O2 = x + y/4
-        ar_teorico = O2 / 0.21
-        CO2 = x
-        H2O = y/2
+        # CÁLCULOS
         
-        # Nitrogênio (N₂) - 79% do ar
-        N2 = ar_teorico * 0.79
+        # a = O₂ necessário
+        a = x + y/4
         
-        st.subheader("Resultados")
+        # b = CO₂ produzido
+        b = x
         
-        st.write(f"**Combustível:** {combustivel}")
-        st.write(f"**O₂ teórico:** {O2:.2f} mol")
-        st.write(f"**Ar teórico:** {ar_teorico:.2f} mol")
-        st.write(f"**CO₂ produzido:** {CO2:.2f} mol")
-        st.write(f"**H₂O produzida:** {H2O:.2f} mol")
-        st.write(f"**N₂:** {N2:.2f} mol")
+        # c = H₂O produzida
+        c = y/2
+        
+        # d = N₂ (3,76 * a, pois a relação N₂/O₂ = 3,76)
+        d = 3.76 * a
+        
+        # Ar teórico = a * (1 + 3,76) = a * 4,76
+        ar_teorico = a * 4.76
+        
+        # EXIBIR RESULTADOS
+        
+        st.subheader("📊 Resultados")
+    
+        # REAÇÃO GLOBAL BALANCEADA (formato solicitado)
+       
+        st.markdown("### ⚗️ Reação Global Balanceada")
+        
+        # Monta a reação no formato: CxHy + a(O2 + 3,76N2) → bCO2 + cH2O + dN2
+        reacao = f"{formula} + {a:.2f}(O₂ + 3,76 N₂) → {b:.2f} CO₂ + {c:.2f} H₂O + {d:.2f} N₂"
+        
+        # Exibe a reação em uma caixa destacada
+        st.markdown(
+            f"""
+            <div style='
+                background-color: #f0f2f6;
+                padding: 20px;
+                border-radius: 10px;
+                border-left: 5px solid #ff4b4b;
+                font-size: 18px;
+                text-align: center;
+                font-family: 'Courier New', monospace;
+            '>
+                <b>{reacao}</b>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+        
+        st.divider()
+        
+        # COEFICIENTES DA REAÇÃO
+
+        st.markdown("### 📋 Coeficientes Estequiométricos")
+        
+        col_coef1, col_coef2, col_coef3, col_coef4, col_coef5 = st.columns(5)
+        
+        with col_coef1:
+            st.metric(
+                label="a (O₂)",
+                value=f"{a:.2f}"
+            )
+        
+        with col_coef2:
+            st.metric(
+                label="b (CO₂)",
+                value=f"{b:.2f}"
+            )
+        
+        with col_coef3:
+            st.metric(
+                label="c (H₂O)",
+                value=f"{c:.2f}"
+            )
+        
+        with col_coef4:
+            st.metric(
+                label="d (N₂)",
+                value=f"{d:.2f}"
+            )
+        
+        with col_coef5:
+            st.metric(
+                label="Ar teórico",
+                value=f"{ar_teorico:.2f} mol"
+            )
+        
+        st.divider()
+    
+        # AR TEÓRICO (em destaque)
+        
+        st.markdown("### 🌬️ Ar Teórico")
+        
+        col_ar1, col_ar2, col_ar3 = st.columns(3)
+        
+        with col_ar1:
+            st.metric(
+                label="Ar teórico (mol)",
+                value=f"{ar_teorico:.2f} mol"
+            )
+        
+        with col_ar2:
+            st.metric(
+                label="O₂ necessário (mol)",
+                value=f"{a:.2f} mol"
+            )
+        
+        with col_ar3:
+            st.metric(
+                label="N₂ acompanhante (mol)",
+                value=f"{d:.2f} mol"
+            )
+        
+        st.divider()
+        
+        # PRODUTOS DA COMBUSTÃO
+       
+        st.markdown("### 🔬 Produtos da Combustão")
+        
+        col_prod1, col_prod2, col_prod3 = st.columns(3)
+        
+        with col_prod1:
+            st.metric(
+                label="CO₂",
+                value=f"{b:.2f} mol"
+            )
+        
+        with col_prod2:
+            st.metric(
+                label="H₂O",
+                value=f"{c:.2f} mol"
+            )
+        
+        with col_prod3:
+            st.metric(
+                label="N₂",
+                value=f"{d:.2f} mol"
+            )
