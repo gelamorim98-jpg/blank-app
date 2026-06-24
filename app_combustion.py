@@ -22,11 +22,11 @@ if "mostrar_equil" not in st.session_state:
 
 # BOTÕES DE NAVEGAÇÃO
 
-if st.button("📁 Balanço Estequiométrico", use_container_width=True):
+if st.button("Balanço Estequiométrico", use_container_width=True):
     st.session_state.mostrar_esteq = True
     st.session_state.mostrar_equil = False
 
-if st.button("📁 Equilíbrio Químico", use_container_width=True):
+if st.button("Equilíbrio Químico", use_container_width=True):
     st.session_state.mostrar_equil = True
     st.session_state.mostrar_esteq = False
 
@@ -69,7 +69,7 @@ if st.session_state.mostrar_esteq:
         
         st.subheader("📊 Resultados")
         
-        st.markdown("Reação Global Balanceada")
+        st.markdown("➡️ Reação Global Balanceada")
         
         # Monta a reação no formato: CxHy + a(O2 + 3,76N2) → bCO2 + cH2O + dN2
         reacao = f"C<sub>{x}</sub>H<sub>{y}</sub> + {a:.2f}(O₂ + 3,76 N₂) → {b:.2f} CO₂ + {c:.2f} H₂O + {d:.2f} N₂"
@@ -96,7 +96,7 @@ if st.session_state.mostrar_esteq:
           
         # AR TEÓRICO (em destaque)
         
-        st.markdown("### 🌬️ Ar Teórico")
+        st.markdown("### ➡️ Ar Teórico")
         
         col_ar1, col_ar2, col_ar3 = st.columns(3)
         
@@ -166,14 +166,13 @@ if st.session_state.mostrar_equil:
         
         st.subheader("📊 Resultados")
     
-        # REAÇÃO GLOBAL BALANCEADA (formato solicitado)
+        # REAÇÃO GLOBAL BALANCEADA 
        
-        st.markdown("### ⚗️ Reação Global Balanceada")
+        st.markdown("### ➡️ Reação Global Balanceada")
         
         # Monta a reação no formato: CxHy + a(O2 + 3,76N2) → bCO2 + cH2O + dN2
         reacao = f"{formula} + {a:.2f}(O₂ + 3,76 N₂) → {b:.2f} CO₂ + {c:.2f} H₂O + {d:.2f} N₂"
         
-        # Exibe a reação em uma caixa destacada
         st.markdown(
             f"""
             <div style='
@@ -193,9 +192,9 @@ if st.session_state.mostrar_equil:
         
         st.divider()
           
-        # AR TEÓRICO (em destaque)
+        # AR TEÓRICO
         
-        st.markdown("### 🌬️ Ar Teórico")
+        st.markdown("### ➡️ Ar Teórico")
         
         col_ar1, col_ar2, col_ar3 = st.columns(3)
         
