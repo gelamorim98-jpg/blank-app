@@ -15,16 +15,15 @@ st.markdown(
 
 # BOTÕES DE NAVEGAÇÃO
 
-botao_esteq = st.button("📊 Balanço Estequiométrico", use_container_width=True)
-botao_equil = st.button("⚖️ Equilíbrio Químico", use_container_width=True)
+botao_esteq = st.button("📁 Balanço Estequiométrico", use_container_width=True)
+botao_equil = st.button("📁 Equilíbrio Químico", use_container_width=True)
 
 st.divider()
 
-# ============================================
-# SEÇÃO 1: BALANÇO ESTEQUIOMÉTRICO
-# ============================================
+# BOTÃO 1: BALANÇO ESTEQUIOMÉTRICO
+
 if botao_esteq:
-    st.header("📊 Balanço Estequiométrico")
+    st.header("📁 Balanço Estequiométrico")
     
     # Entrada do combustível genérico CxHy
     col1, col2 = st.columns(2)
