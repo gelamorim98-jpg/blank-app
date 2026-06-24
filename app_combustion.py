@@ -23,12 +23,18 @@ st.divider()
 if botao_esteq:
     st.header("📁 Balanço Estequiométrico")
     
+    # Inicializa os valores se não existirem
+    if "x_esteq" not in st.session_state:
+        st.session_state.x_esteq = 1
+    if "y_esteq" not in st.session_state:
+        st.session_state.y_esteq = 4
+    
     col1, col2 = st.columns(2)
     
     with col1:
-        x = st.number_input("Número de Carbonos:", min_value=1, value=1, step=1, key="x_carbonos")
+        x = st.number_input("Número de Carbonos:", min_value=1, value=st.session_state.x_esteq, step=1, key="x_esteq")
     with col2:
-        y = st.number_input("Número de Hidrogênios:", min_value=1, value=4, step=1, key="y_hidrogenios")
+        y = st.number_input("Número de Hidrogênios:", min_value=1, value=st.session_state.y_esteq, step=1, key="y_esteq")
     
     st.write(f"**Combustível:** C<sub>{x}</sub>H<sub>{y}</sub>", unsafe_allow_html=True)
     
