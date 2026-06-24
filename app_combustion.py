@@ -39,7 +39,9 @@ if st.session_state.mostrar_esteq:
         x = st.number_input("Número de Carbonos:", min_value=1, value=1, step=1)
     with col2:
         y = st.number_input("Número de Hidrogênios:", min_value=1, value=4, step=1)
-    
+    with col3:;
+        e = st.number_input("Percentual de ar teórico (ex.: se excesso de 100%, colocar 2):", min_value=0, value=1, step=0.05)   
+        
     st.write(f"**Combustível:** C<sub>{x}</sub>H<sub>{y}</sub>", unsafe_allow_html=True)
     
     if st.button("Calcular Estequiometria"):
