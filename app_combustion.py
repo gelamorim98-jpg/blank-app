@@ -33,7 +33,7 @@ st.divider()
 if st.session_state.mostrar_esteq:
     st.header("Balanço Estequiométrico")
     
-    col1, col2 = st.columns(2)
+    col1, col2, col3 = st.columns(3)
     
     with col1:
         x = st.number_input("Número de Carbonos:", min_value=1, value=1, step=1)
