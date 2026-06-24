@@ -34,7 +34,7 @@ if botao_esteq:
     
     st.write(f"**Combustível:** C<sub>{x}</sub>H<sub>{y}</sub>", unsafe_allow_html=True)
     
-    if st.button("Calcular Estequiometria"):
+    if st.button("Calcular Estequiometria", key="calc_esteq"):
         
         O2 = x + y/4
         ar_teorico = O2 / 0.21
