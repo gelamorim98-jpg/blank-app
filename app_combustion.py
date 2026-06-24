@@ -70,7 +70,7 @@ if st.session_state.mostrar_esteq:
         st.divider()
         
         st.markdown(
-            "<h2 style='text-align: center;'>📊 Resultados</h2>",
+            "<h2 style='text-align: center;'>Resultados</h2>",
             unsafe_allow_html=True
         )
 
@@ -171,7 +171,14 @@ if st.session_state.mostrar_equil:
         
         # EXIBIR RESULTADOS
         
-        st.subheader("📊 Resultados")
+        st.divider()
+        
+        st.markdown(
+            "<h2 style='text-align: center;'>Resultados</h2>",
+            unsafe_allow_html=True
+        )
+
+        st.divider()
     
         # REAÇÃO GLOBAL BALANCEADA 
        
