@@ -96,7 +96,7 @@ if st.session_state.mostrar_esteq:
           
         # AR TEÓRICO (em destaque)
         
-        st.markdown("### ➡️ Ar Teórico")
+        st.markdown(" ➡️ Ar Teórico")
         
         col_ar1, col_ar2, col_ar3 = st.columns(3)
         
