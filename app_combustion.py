@@ -12,26 +12,17 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# ============================================
-# ESTADO DA PÁGINA
-# ============================================
+# ARMAZENAMENTO DE DADOS
+
 if "mostrar_esteq" not in st.session_state:
     st.session_state.mostrar_esteq = False
 if "mostrar_equil" not in st.session_state:
     st.session_state.mostrar_equil = False
 
 # BOTÕES DE NAVEGAÇÃO
-col1, col2 = st.columns(2)
 
-with col1:
-    if st.button("📁 Balanço Estequiométrico", use_container_width=True):
-        st.session_state.mostrar_esteq = True
-        st.session_state.mostrar_equil = False
-
-with col2:
-    if st.button("📁 Equilíbrio Químico", use_container_width=True):
-        st.session_state.mostrar_equil = True
-        st.session_state.mostrar_esteq = False
+botao_esteq = st.button("📊 Balanço Estequiométrico", use_container_width=True)
+botao_equil = st.button("⚖️ Equilíbrio Químico", use_container_width=True)
 
 st.divider()
 
