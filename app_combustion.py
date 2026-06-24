@@ -36,13 +36,11 @@ if botao_esteq:
     
     if st.button("Calcular Estequiometria"):
         
-        # Cálculos
         O2 = x + y/4
         ar_teorico = O2 / 0.21
         CO2 = x
         H2O = y/2
         
-        # Exibir resultados
         st.subheader("Resultados")
         
         st.write(f"**Combustível:** C{x}H{y}")
