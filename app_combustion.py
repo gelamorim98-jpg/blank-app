@@ -6,7 +6,10 @@ st.set_page_config(
     layout="wide"
 )
 
-st.title("Estequiometria e Equilíbrio Químico - Combustão")
+st.markdown(
+    "<h1 style='text-align: center;'>Combustão - Estequiometria e Equilíbrio Químico</h1>",
+    unsafe_allow_html=True
+)
 
 # BOTÕES DE NAVEGAÇÃO
 
