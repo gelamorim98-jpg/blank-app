@@ -67,6 +67,8 @@ if st.session_state.mostrar_esteq:
         
         # RESULTADOS
         
+        st.divider()
+        
         st.subheader("📊 Resultados")
         
         st.markdown("### ➡️ Reação Global Balanceada")
