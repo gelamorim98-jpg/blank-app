@@ -4,7 +4,7 @@ import math
 # TÍTULO DA PÁGINA
 
 st.set_page_config(
-    page_title="gESSICA Combustão - Estequiometria e Equilíbrio Químico",
+    page_title="Combustão - Estequiometria e Equilíbrio Químico",
     layout="wide"
 )
 
