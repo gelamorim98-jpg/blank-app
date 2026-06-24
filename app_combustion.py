@@ -69,7 +69,12 @@ if st.session_state.mostrar_esteq:
         
         st.divider()
         
-        st.subheader("📊 Resultados")
+        st.markdown(
+            "<h2 style='text-align: center;'>📊 Resultados</h2>",
+            unsafe_allow_html=True
+        )
+
+        st.divider()
         
         st.markdown("### ➡️ Reação Global Balanceada")
         
