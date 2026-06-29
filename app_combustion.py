@@ -241,22 +241,6 @@ if st.session_state.mostrar_esteq:
                 )
         st.divider()
         
-        # INFORMAÇÕES SOBRE OS PRODUTOS
-        if fator_excesso < 1:
-            st.markdown("### ➡️ Produtos da Combustão Incompleta")
-            col_prod1, col_prod2 = st.columns(2)
-            with col_prod1:
-                if co > 0:
-                    st.warning(f"⚠️ **CO formado:** {co:.2f} mol")
-                if carbono_solid > 0:
-                    st.warning(f"⚠️ **Carbono sólido formado:** {carbono_solid:.2f} mol")
-            with col_prod2:
-                st.info(f"**CO₂ formado:** {b:.2f} mol")
-                st.info(f"**H₂O formada:** {c:.2f} mol")
-                
-        st.divider()
-        st.caption("💡 Nota: Em condições de deficiência de ar, a combustão é incompleta e pode formar CO e/ou carbono sólido.")
-
 # =============================================
 # OPÇÃO 2: PODER CALORÍFICO
 # =============================================
