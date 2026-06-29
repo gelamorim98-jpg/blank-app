@@ -98,26 +98,21 @@ if st.session_state.mostrar_esteq:
         
         # b = CO₂ produzido (depende se há deficiência de ar)
         if fator_excesso < 1:
-            # Em deficiência de ar, pode haver CO e/ou carbono
-            # O₂ disponível para oxidar C após formar H₂O
             o2_para_c = a_real - (y/4)
             
             if o2_para_c >= x:
-                # O₂ suficiente para oxidar todo C a CO₂
                 b = x
                 c = y/2
                 co = 0
                 o2_residual = max(0, o2_para_c - x)
                 carbono_solid = 0
             elif o2_para_c > 0:
-                # O₂ insuficiente para oxidar todo C a CO₂
                 b = o2_para_c
                 co = (x - b) * 2
                 c = y/2
                 o2_residual = 0
                 carbono_solid = 0
             else:
-                # Sem O₂ para oxidar C (apenas H₂O)
                 b = 0
                 co = x * 2
                 c = y/2
@@ -146,7 +141,7 @@ if st.session_state.mostrar_esteq:
             o2_residual = max(0, a_real - a_teorico)
             carbono_solid = 0
         
-        # N₂ acompanhante
+        # N₂ produtos
         d = 3.76 * a_real
         
         # Ar real
@@ -166,7 +161,7 @@ if st.session_state.mostrar_esteq:
         elif tipo_ar == "Deficiência de ar":
             st.markdown(f"**Condição:** {deficiencia_valor:.1f}% de deficiência de ar")
         else:
-            st.markdown("**Condição:** Estequiométrica")
+            st.markdown("**Condição:** Ar teórico")
             
         st.divider()
         
@@ -225,7 +220,7 @@ if st.session_state.mostrar_esteq:
             )
         with col_ar3:
             st.metric(
-                label="N₂ acompanhante (mol)",
+                label="N₂ do ar (mol)",
                 value=f"{d:.2f} mol"
             )
         with col_ar4:
@@ -258,87 +253,7 @@ if st.session_state.mostrar_esteq:
             with col_prod2:
                 st.info(f"**CO₂ formado:** {b:.2f} mol")
                 st.info(f"**H₂O formada:** {c:.2f} mol")
-        
-        # ===== CÁLCULO DO CALOR (SE SELECIONADO) =====
-        if incluir_calor:
-            st.divider()
-            st.markdown("### ➡️ Calor de Combustão")
-            
-            # Opção de PCS/PCI
-            tipo_calor = st.radio(
-                "Tipo de poder calorífico:",
-                options=["PCS (água líquida)", "PCI (água vapor)"],
-                index=0,
-                horizontal=True
-            )
-            
-            # Entalpias de formação (kJ/mol) a 25°C
-            delta_hf = {
-                'CO2': -393.5,
-                'H2O_l': -285.8,
-                'H2O_g': -241.8,
-                'CO': -110.5,
-                'C': 0.0,
-                'O2': 0.0,
-                'N2': 0.0
-            }
-            
-            # Entalpia de formação do combustível
-            if x == 1 and y == 4:
-                delta_hf_combustivel = -74.8
-            elif x == 2 and y == 6:
-                delta_hf_combustivel = -84.7
-            elif x == 3 and y == 8:
-                delta_hf_combustivel = -103.8
-            elif x == 4 and y == 10:
-                delta_hf_combustivel = -126.1
-            elif x == 5 and y == 12:
-                delta_hf_combustivel = -146.8
-            elif x == 6 and y == 14:
-                delta_hf_combustivel = -167.2
-            elif x == 7 and y == 16:
-                delta_hf_combustivel = -187.8
-            elif x == 8 and y == 18:
-                delta_hf_combustivel = -208.4
-            elif x == 10 and y == 22:
-                delta_hf_combustivel = -249.6
-            else:
-                delta_hf_combustivel = -(20*x + 10*y)
-            
-            # Cálculo do calor
-            delta_h_produtos = 0
-            
-            if b > 0:
-                delta_h_produtos += b * delta_hf['CO2']
-            if co > 0:
-                delta_h_produtos += co * delta_hf['CO']
-            if carbono_solid > 0:
-                delta_h_produtos += carbono_solid * delta_hf['C']
-            if c > 0:
-                if tipo_calor == "PCS (água líquida)":
-                    delta_h_produtos += c * delta_hf['H2O_l']
-                else:
-                    delta_h_produtos += c * delta_hf['H2O_g']
-            
-            delta_h_reagentes = delta_hf_combustivel
-            delta_h_combustao = delta_h_produtos - delta_h_reagentes
-            calor_liberado = -delta_h_combustao
-            
-            massa_molar = x*12 + y*1
-            calor_liberado_kg = calor_liberado * 1000 / massa_molar
-            
-            col_calor1, col_calor2 = st.columns(2)
-            with col_calor1:
-                st.metric("Calor liberado", f"{calor_liberado:.1f} kJ/mol")
-            with col_calor2:
-                st.metric("Calor liberado", f"{calor_liberado_kg:.1f} kJ/kg")
-            
-            with st.expander("📊 Detalhes do cálculo"):
-                st.write(f"**ΔHf° do combustível:** {delta_hf_combustivel:.1f} kJ/mol")
-                st.write(f"**ΔH dos produtos:** {delta_h_produtos:.1f} kJ/mol")
-                st.write(f"**ΔH da combustão:** {delta_h_combustao:.1f} kJ/mol")
-                st.write(f"**Massa molar:** {massa_molar:.1f} g/mol")
-        
+                
         st.divider()
         st.caption("💡 Nota: Em condições de deficiência de ar, a combustão é incompleta e pode formar CO e/ou carbono sólido.")
 
