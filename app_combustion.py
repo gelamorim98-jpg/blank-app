@@ -74,8 +74,28 @@ if st.session_state.mostrar_esteq:
         else:  # Estequiométrico
             fator_excesso = 1.0
             st.info("✅ Condição estequiométrica (sem excesso ou deficiência de ar)")
+    
+    # Opção para escolher entre PCS e PCI
+    st.divider()
+    st.markdown("### Calor de Combustão")
+    
+    col_calor1, col_calor2 = st.columns(2)
+    
+    with col_calor1:
+        tipo_calor = st.radio(
+            "Tipo de poder calorífico:",
+            options=["Poder Calorífico Superior (PCS)", "Poder Calorífico Inferior (PCI)"],
+            index=0,
+            horizontal=True
+        )
+    
+    with col_calor2:
+        # Dados de entalpia de formação (kJ/mol) a 25°C
+        # Fonte: dados termodinâmicos padrão
+        st.caption("Dados termodinâmicos a 25°C e 1 atm")
+        st.caption("ΔHf° (kJ/mol): CO₂ = -393.5 | H₂O(g) = -241.8 | H₂O(l) = -285.8")
         
-    if st.button("Calcular Estequiometria"):
+    if st.button("Calcular Estequiometria", use_container_width=True):
         
         # CÁLCULOS ESTEQUIOMÉTRICOS (ar teórico)
         a_teorico = x + y/4  # O₂ necessário estequiométrico
@@ -86,46 +106,33 @@ if st.session_state.mostrar_esteq:
         # b = CO₂ produzido (depende se há deficiência de ar)
         if fator_excesso < 1:
             # Em deficiência de ar, pode haver CO e/ou carbono
-            # Vamos considerar a combustão incompleta com CO
-            # Para simplificar: a quantidade de CO₂ é limitada pelo O₂ disponível
-            # CO₂ máximo possível = O₂ disponível / 1 (para cada CO₂ precisa de 1 O₂)
-            # Mas precisamos também de O₂ para H₂O
-            # Simplificando: primeiro forma H₂O, depois CO₂, depois CO se ainda tiver C
-            
             # O₂ disponível para oxidar C após formar H₂O
             o2_para_c = a_real - (y/4)
             
             if o2_para_c >= x:
                 # O₂ suficiente para oxidar todo C a CO₂
                 b = x
-                # O₂ restante (se houver) - não usado
                 c = y/2
-                # Neste caso, não há CO
                 co = 0
-                # Mas pode ter O₂ residual se houver excesso
                 o2_residual = max(0, o2_para_c - x)
+                carbono_solid = 0
             elif o2_para_c > 0:
                 # O₂ insuficiente para oxidar todo C a CO₂
-                # Primeiro, todo CO₂ que pode ser formado
-                b = o2_para_c  # cada mol de CO₂ precisa de 1 mol de O₂
-                # O restante do C forma CO (cada mol de CO precisa de 0.5 mol de O₂)
+                b = o2_para_c
                 co = (x - b) * 2
-                # Mas precisamos verificar se há O₂ suficiente para isso
-                # Na verdade, com deficiência, o cálculo é mais complexo
-                # Vamos usar uma simplificação: tudo que sobra após CO₂ vira CO
                 c = y/2
                 o2_residual = 0
+                carbono_solid = 0
             else:
                 # Sem O₂ para oxidar C (apenas H₂O)
                 b = 0
-                co = x * 2  # Todo carbono vira CO (ou carbono sólido, mas vamos considerar CO)
+                co = x * 2
                 c = y/2
                 o2_residual = 0
-                
+                carbono_solid = 0
+            
             # Ajuste para quando não há O₂ suficiente nem para CO
             if co > 0 and a_real < y/4 + co/2:
-                # Não há O₂ suficiente para todo CO, parte do carbono fica sólido
-                # Vamos simplificar: forma o máximo de CO possível
                 o2_disponivel_co = a_real - y/4
                 if o2_disponivel_co > 0:
                     co = o2_disponivel_co * 2
@@ -135,7 +142,9 @@ if st.session_state.mostrar_esteq:
                     co = 0
                     carbono_solid = x
             else:
-                carbono_solid = 0
+                if carbono_solid == 0 and co > 0 and b == 0:
+                    # Verifica se todo C foi convertido
+                    carbono_solid = max(0, x - co/2)
                 
         else:
             # Estequiométrico ou excesso de ar
@@ -150,6 +159,91 @@ if st.session_state.mostrar_esteq:
         
         # Ar real
         ar_real = a_real * 4.76
+        
+        # ===== CÁLCULO DO CALOR DE COMBUSTÃO =====
+        
+        # Entalpias de formação (kJ/mol) a 25°C
+        # Valores padrão
+        delta_hf = {
+            'CO2': -393.5,      # CO₂(g)
+            'H2O_l': -285.8,    # H₂O(l)
+            'H2O_g': -241.8,    # H₂O(g)
+            'CO': -110.5,       # CO(g)
+            'C': 0.0,           # C(s) - grafite
+            'O2': 0.0,          # O₂(g)
+            'N2': 0.0           # N₂(g)
+        }
+        
+        # Entalpia de formação do combustível (CxHy)
+        # Estimativa usando método de grupo ou valores tabelados
+        # Para hidrocarbonetos simples, usamos valores aproximados
+        # Fórmula: ΔHf°(CxHy) ≈ x*ΔHf°(C) + y*ΔHf°(H) - calor de formação
+        # Usando valores aproximados para alcanos: - (20*x + 10*y) kJ/mol
+        # Para simplificar, vamos usar uma estimativa baseada no número de carbonos
+        # Valores reais para alguns combustíveis comuns:
+        if x == 1 and y == 4:  # Metano
+            delta_hf_combustivel = -74.8
+        elif x == 2 and y == 6:  # Etano
+            delta_hf_combustivel = -84.7
+        elif x == 3 and y == 8:  # Propano
+            delta_hf_combustivel = -103.8
+        elif x == 4 and y == 10:  # Butano
+            delta_hf_combustivel = -126.1
+        elif x == 5 and y == 12:  # Pentano
+            delta_hf_combustivel = -146.8
+        elif x == 6 and y == 14:  # Hexano
+            delta_hf_combustivel = -167.2
+        elif x == 7 and y == 16:  # Heptano
+            delta_hf_combustivel = -187.8
+        elif x == 8 and y == 18:  # Octano
+            delta_hf_combustivel = -208.4
+        elif x == 10 and y == 22:  # Decano
+            delta_hf_combustivel = -249.6
+        else:
+            # Estimativa para outros hidrocarbonetos
+            # Baseado em dados de alcanos: ΔHf° ≈ -(4.9*x + 0.9*y + 2.5) kJ/mol por carbono
+            # Ajuste para alcanos: aproximadamente - (20*x + 10*y) kJ/mol
+            delta_hf_combustivel = -(20*x + 10*y)
+        
+        # Cálculo do calor de combustão (Lei de Hess)
+        # ΔH_comb = Σ(n*ΔHf°_produtos) - Σ(n*ΔHf°_reagentes)
+        
+        # Produtos
+        delta_h_produtos = 0
+        
+        # CO₂
+        if b > 0:
+            delta_h_produtos += b * delta_hf['CO2']
+        
+        # CO
+        if co > 0:
+            delta_h_produtos += co * delta_hf['CO']
+        
+        # Carbono sólido
+        if carbono_solid > 0:
+            delta_h_produtos += carbono_solid * delta_hf['C']
+        
+        # H₂O (depende se é PCS ou PCI)
+        if c > 0:
+            if tipo_calor == "Poder Calorífico Superior (PCS)":
+                # Água líquida
+                delta_h_produtos += c * delta_hf['H2O_l']
+            else:
+                # Água vapor
+                delta_h_produtos += c * delta_hf['H2O_g']
+        
+        # Reagentes
+        delta_h_reagentes = delta_hf_combustivel  # Apenas o combustível (O₂ e N₂ são 0)
+        
+        # Calor de combustão (kJ/mol de combustível)
+        delta_h_combustao = delta_h_produtos - delta_h_reagentes
+        
+        # Calor liberado por mol de combustível (negativo = exotérmico)
+        calor_liberado = -delta_h_combustao  # kJ/mol
+        
+        # Conversão para kJ/kg (considerando massa molar do combustível)
+        massa_molar = x*12 + y*1  # g/mol
+        calor_liberado_kg = calor_liberado * 1000 / massa_molar  # kJ/kg
         
         # RESULTADOS
         st.divider()
@@ -207,6 +301,60 @@ if st.session_state.mostrar_esteq:
             unsafe_allow_html=True
         )
         st.divider()
+        
+        # ===== CALOR DE COMBUSTÃO =====
+        st.markdown("### ➡️ Calor de Combustão")
+        
+        col_calor1, col_calor2, col_calor3, col_calor4 = st.columns(4)
+        
+        with col_calor1:
+            st.metric(
+                label=f"Calor liberado",
+                value=f"{calor_liberado:.1f} kJ/mol"
+            )
+        
+        with col_calor2:
+            st.metric(
+                label=f"Calor liberado",
+                value=f"{calor_liberado_kg:.1f} kJ/kg"
+            )
+        
+        with col_calor3:
+            st.metric(
+                label=f"Combustível",
+                value=f"C{'{'}{x}{'}'}H{'{'}{y}{'}'}"
+            )
+        
+        with col_calor4:
+            st.metric(
+                label=f"Tipo",
+                value="PCS" if tipo_calor == "Poder Calorífico Superior (PCS)" else "PCI"
+            )
+        
+        # Informações adicionais sobre o calor
+        st.info(
+            f"""
+            **💡 Detalhes do cálculo:**
+            - ΔHf° do combustível: {delta_hf_combustivel:.1f} kJ/mol
+            - ΔH dos produtos: {delta_h_produtos:.1f} kJ/mol
+            - ΔH da combustão: {delta_h_combustao:.1f} kJ/mol
+            - Massa molar do combustível: {massa_molar:.1f} g/mol
+            """
+        )
+        
+        # Comparação com combustíveis comuns
+        st.caption("📊 Comparação (valores aproximados):")
+        col_comp1, col_comp2, col_comp3, col_comp4 = st.columns(4)
+        with col_comp1:
+            st.metric("Metano (CH₄)", "55.5 MJ/kg", delta="PCS")
+        with col_comp2:
+            st.metric("Propano (C₃H₈)", "50.3 MJ/kg", delta="PCS")
+        with col_comp3:
+            st.metric("Octano (C₈H₁₈)", "47.8 MJ/kg", delta="PCS")
+        with col_comp4:
+            st.metric("Hidrogênio (H₂)", "141.8 MJ/kg", delta="PCS")
+        
+        st.divider()
           
         # INFORMAÇÕES SOBRE AR
         st.markdown("### ➡️ Informações sobre o Ar")
@@ -259,4 +407,4 @@ if st.session_state.mostrar_esteq:
                 st.info(f"**H₂O formada:** {c:.2f} mol")
         
         st.divider()
-        st.caption("💡 Nota: Em condições de deficiência de ar, a combustão é incompleta e pode formar CO e/ou carbono sólido.")
+        st.caption("💡 Nota: Em condições de deficiência de ar, a combustão é incompleta e pode formar CO e/ou carbono sólido. O calor liberado será menor.")
