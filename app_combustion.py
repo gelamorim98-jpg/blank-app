@@ -16,6 +16,25 @@ st.markdown(
 if "mostrar_esteq" not in st.session_state:
     st.session_state.mostrar_esteq = False
 
+# OPÇÃO DE PODER CALORÍFICO - NO TOPO
+st.markdown("### ⚡ Configuração do Calor de Combustão")
+col_calor_config1, col_calor_config2 = st.columns(2)
+
+with col_calor_config1:
+    tipo_calor = st.radio(
+        "Tipo de poder calorífico:",
+        options=["Poder Calorífico Superior (PCS)", "Poder Calorífico Inferior (PCI)"],
+        index=0,
+        horizontal=True
+    )
+
+with col_calor_config2:
+    st.caption("📌 **PCS**: Água nos produtos no estado líquido")
+    st.caption("📌 **PCI**: Água nos produtos no estado vapor")
+    st.caption("📌 ΔHf° (kJ/mol): CO₂ = -393.5 | H₂O(l) = -285.8 | H₂O(g) = -241.8")
+
+st.divider()
+
 # BOTÕES DE NAVEGAÇÃO
 if st.button("Balanço Estequiométrico", use_container_width=True):
     st.session_state.mostrar_esteq = True
@@ -74,26 +93,6 @@ if st.session_state.mostrar_esteq:
         else:  # Estequiométrico
             fator_excesso = 1.0
             st.info("✅ Condição estequiométrica (sem excesso ou deficiência de ar)")
-    
-    # Opção para escolher entre PCS e PCI
-    st.divider()
-    st.markdown("### Calor de Combustão")
-    
-    col_calor1, col_calor2 = st.columns(2)
-    
-    with col_calor1:
-        tipo_calor = st.radio(
-            "Tipo de poder calorífico:",
-            options=["Poder Calorífico Superior (PCS)", "Poder Calorífico Inferior (PCI)"],
-            index=0,
-            horizontal=True
-        )
-    
-    with col_calor2:
-        # Dados de entalpia de formação (kJ/mol) a 25°C
-        # Fonte: dados termodinâmicos padrão
-        st.caption("Dados termodinâmicos a 25°C e 1 atm")
-        st.caption("ΔHf° (kJ/mol): CO₂ = -393.5 | H₂O(g) = -241.8 | H₂O(l) = -285.8")
         
     if st.button("Calcular Estequiometria", use_container_width=True):
         
@@ -163,7 +162,6 @@ if st.session_state.mostrar_esteq:
         # ===== CÁLCULO DO CALOR DE COMBUSTÃO =====
         
         # Entalpias de formação (kJ/mol) a 25°C
-        # Valores padrão
         delta_hf = {
             'CO2': -393.5,      # CO₂(g)
             'H2O_l': -285.8,    # H₂O(l)
@@ -175,12 +173,7 @@ if st.session_state.mostrar_esteq:
         }
         
         # Entalpia de formação do combustível (CxHy)
-        # Estimativa usando método de grupo ou valores tabelados
-        # Para hidrocarbonetos simples, usamos valores aproximados
-        # Fórmula: ΔHf°(CxHy) ≈ x*ΔHf°(C) + y*ΔHf°(H) - calor de formação
-        # Usando valores aproximados para alcanos: - (20*x + 10*y) kJ/mol
-        # Para simplificar, vamos usar uma estimativa baseada no número de carbonos
-        # Valores reais para alguns combustíveis comuns:
+        # Valores para combustíveis comuns
         if x == 1 and y == 4:  # Metano
             delta_hf_combustivel = -74.8
         elif x == 2 and y == 6:  # Etano
@@ -201,8 +194,6 @@ if st.session_state.mostrar_esteq:
             delta_hf_combustivel = -249.6
         else:
             # Estimativa para outros hidrocarbonetos
-            # Baseado em dados de alcanos: ΔHf° ≈ -(4.9*x + 0.9*y + 2.5) kJ/mol por carbono
-            # Ajuste para alcanos: aproximadamente - (20*x + 10*y) kJ/mol
             delta_hf_combustivel = -(20*x + 10*y)
         
         # Cálculo do calor de combustão (Lei de Hess)
@@ -245,7 +236,7 @@ if st.session_state.mostrar_esteq:
         massa_molar = x*12 + y*1  # g/mol
         calor_liberado_kg = calor_liberado * 1000 / massa_molar  # kJ/kg
         
-        # RESULTADOS
+        # ===== EXIBIÇÃO DOS RESULTADOS =====
         st.divider()
         st.markdown(
             "<h2 style='text-align: center;'>Resultados</h2>",
@@ -260,6 +251,9 @@ if st.session_state.mostrar_esteq:
             st.markdown(f"**Condição:** {deficiencia_valor:.1f}% de deficiência de ar")
         else:
             st.markdown("**Condição:** Estequiométrica")
+        
+        # Mostra o tipo de poder calorífico selecionado
+        st.markdown(f"**Poder calorífico:** {tipo_calor}")
             
         st.divider()
         
@@ -305,7 +299,7 @@ if st.session_state.mostrar_esteq:
         # ===== CALOR DE COMBUSTÃO =====
         st.markdown("### ➡️ Calor de Combustão")
         
-        col_calor1, col_calor2, col_calor3, col_calor4 = st.columns(4)
+        col_calor1, col_calor2, col_calor3 = st.columns(3)
         
         with col_calor1:
             st.metric(
@@ -325,34 +319,17 @@ if st.session_state.mostrar_esteq:
                 value=f"C{'{'}{x}{'}'}H{'{'}{y}{'}'}"
             )
         
-        with col_calor4:
-            st.metric(
-                label=f"Tipo",
-                value="PCS" if tipo_calor == "Poder Calorífico Superior (PCS)" else "PCI"
-            )
-        
         # Informações adicionais sobre o calor
-        st.info(
-            f"""
-            **💡 Detalhes do cálculo:**
-            - ΔHf° do combustível: {delta_hf_combustivel:.1f} kJ/mol
-            - ΔH dos produtos: {delta_h_produtos:.1f} kJ/mol
-            - ΔH da combustão: {delta_h_combustao:.1f} kJ/mol
-            - Massa molar do combustível: {massa_molar:.1f} g/mol
-            """
-        )
-        
-        # Comparação com combustíveis comuns
-        st.caption("📊 Comparação (valores aproximados):")
-        col_comp1, col_comp2, col_comp3, col_comp4 = st.columns(4)
-        with col_comp1:
-            st.metric("Metano (CH₄)", "55.5 MJ/kg", delta="PCS")
-        with col_comp2:
-            st.metric("Propano (C₃H₈)", "50.3 MJ/kg", delta="PCS")
-        with col_comp3:
-            st.metric("Octano (C₈H₁₈)", "47.8 MJ/kg", delta="PCS")
-        with col_comp4:
-            st.metric("Hidrogênio (H₂)", "141.8 MJ/kg", delta="PCS")
+        with st.expander("📊 Detalhes do cálculo do calor"):
+            st.write(f"**Entalpia de formação do combustível:** {delta_hf_combustivel:.1f} kJ/mol")
+            st.write(f"**Entalpia dos produtos:** {delta_h_produtos:.1f} kJ/mol")
+            st.write(f"**ΔH da combustão:** {delta_h_combustao:.1f} kJ/mol")
+            st.write(f"**Massa molar do combustível:** {massa_molar:.1f} g/mol")
+            
+            if tipo_calor == "Poder Calorífico Superior (PCS)":
+                st.success("✅ Usando H₂O(l) nos produtos (PCS)")
+            else:
+                st.info("ℹ️ Usando H₂O(g) nos produtos (PCI)")
         
         st.divider()
           
