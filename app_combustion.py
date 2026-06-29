@@ -15,34 +15,29 @@ st.markdown(
 # ARMAZENAMENTO DAS VARIÁVEIS
 if "mostrar_esteq" not in st.session_state:
     st.session_state.mostrar_esteq = False
+if "mostrar_calor" not in st.session_state:
+    st.session_state.mostrar_calor = False
 
-# OPÇÃO DE PODER CALORÍFICO - NO TOPO
-st.markdown("### ⚡ Configuração do Calor de Combustão")
-col_calor_config1, col_calor_config2 = st.columns(2)
+# BOTÕES DE NAVEGAÇÃO - ESCOLHA ENTRE AS OPÇÕES
+col_botao1, col_botao2 = st.columns(2)
 
-with col_calor_config1:
-    tipo_calor = st.radio(
-        "Tipo de poder calorífico:",
-        options=["Poder Calorífico Superior (PCS)", "Poder Calorífico Inferior (PCI)"],
-        index=0,
-        horizontal=True
-    )
+with col_botao1:
+    if st.button("🔬 Balanço Estequiométrico", use_container_width=True):
+        st.session_state.mostrar_esteq = True
+        st.session_state.mostrar_calor = False
 
-with col_calor_config2:
-    st.caption("📌 **PCS**: Água nos produtos no estado líquido")
-    st.caption("📌 **PCI**: Água nos produtos no estado vapor")
-    st.caption("📌 ΔHf° (kJ/mol): CO₂ = -393.5 | H₂O(l) = -285.8 | H₂O(g) = -241.8")
+with col_botao2:
+    if st.button("🔥 Poder Calorífico", use_container_width=True):
+        st.session_state.mostrar_calor = True
+        st.session_state.mostrar_esteq = False
 
 st.divider()
 
-# BOTÕES DE NAVEGAÇÃO
-if st.button("Balanço Estequiométrico", use_container_width=True):
-    st.session_state.mostrar_esteq = True
-    st.session_state.mostrar_equil = False
-st.divider()
-
-# BALANÇO ESTEQUIOMÉTRICO
+# =============================================
+# OPÇÃO 1: BALANÇO ESTEQUIOMÉTRICO
+# =============================================
 if st.session_state.mostrar_esteq:
+    st.header("🔬 Balanço Estequiométrico")
     
     col1, col2 = st.columns(2)
     
@@ -93,7 +88,10 @@ if st.session_state.mostrar_esteq:
         else:  # Estequiométrico
             fator_excesso = 1.0
             st.info("✅ Condição estequiométrica (sem excesso ou deficiência de ar)")
-        
+    
+    # Opção para incluir ou não o cálculo do calor
+    incluir_calor = st.checkbox("Calcular também o calor de combustão", value=False)
+    
     if st.button("Calcular Estequiometria", use_container_width=True):
         
         # CÁLCULOS ESTEQUIOMÉTRICOS (ar teórico)
@@ -142,7 +140,6 @@ if st.session_state.mostrar_esteq:
                     carbono_solid = x
             else:
                 if carbono_solid == 0 and co > 0 and b == 0:
-                    # Verifica se todo C foi convertido
                     carbono_solid = max(0, x - co/2)
                 
         else:
@@ -159,87 +156,10 @@ if st.session_state.mostrar_esteq:
         # Ar real
         ar_real = a_real * 4.76
         
-        # ===== CÁLCULO DO CALOR DE COMBUSTÃO =====
-        
-        # Entalpias de formação (kJ/mol) a 25°C
-        delta_hf = {
-            'CO2': -393.5,      # CO₂(g)
-            'H2O_l': -285.8,    # H₂O(l)
-            'H2O_g': -241.8,    # H₂O(g)
-            'CO': -110.5,       # CO(g)
-            'C': 0.0,           # C(s) - grafite
-            'O2': 0.0,          # O₂(g)
-            'N2': 0.0           # N₂(g)
-        }
-        
-        # Entalpia de formação do combustível (CxHy)
-        # Valores para combustíveis comuns
-        if x == 1 and y == 4:  # Metano
-            delta_hf_combustivel = -74.8
-        elif x == 2 and y == 6:  # Etano
-            delta_hf_combustivel = -84.7
-        elif x == 3 and y == 8:  # Propano
-            delta_hf_combustivel = -103.8
-        elif x == 4 and y == 10:  # Butano
-            delta_hf_combustivel = -126.1
-        elif x == 5 and y == 12:  # Pentano
-            delta_hf_combustivel = -146.8
-        elif x == 6 and y == 14:  # Hexano
-            delta_hf_combustivel = -167.2
-        elif x == 7 and y == 16:  # Heptano
-            delta_hf_combustivel = -187.8
-        elif x == 8 and y == 18:  # Octano
-            delta_hf_combustivel = -208.4
-        elif x == 10 and y == 22:  # Decano
-            delta_hf_combustivel = -249.6
-        else:
-            # Estimativa para outros hidrocarbonetos
-            delta_hf_combustivel = -(20*x + 10*y)
-        
-        # Cálculo do calor de combustão (Lei de Hess)
-        # ΔH_comb = Σ(n*ΔHf°_produtos) - Σ(n*ΔHf°_reagentes)
-        
-        # Produtos
-        delta_h_produtos = 0
-        
-        # CO₂
-        if b > 0:
-            delta_h_produtos += b * delta_hf['CO2']
-        
-        # CO
-        if co > 0:
-            delta_h_produtos += co * delta_hf['CO']
-        
-        # Carbono sólido
-        if carbono_solid > 0:
-            delta_h_produtos += carbono_solid * delta_hf['C']
-        
-        # H₂O (depende se é PCS ou PCI)
-        if c > 0:
-            if tipo_calor == "Poder Calorífico Superior (PCS)":
-                # Água líquida
-                delta_h_produtos += c * delta_hf['H2O_l']
-            else:
-                # Água vapor
-                delta_h_produtos += c * delta_hf['H2O_g']
-        
-        # Reagentes
-        delta_h_reagentes = delta_hf_combustivel  # Apenas o combustível (O₂ e N₂ são 0)
-        
-        # Calor de combustão (kJ/mol de combustível)
-        delta_h_combustao = delta_h_produtos - delta_h_reagentes
-        
-        # Calor liberado por mol de combustível (negativo = exotérmico)
-        calor_liberado = -delta_h_combustao  # kJ/mol
-        
-        # Conversão para kJ/kg (considerando massa molar do combustível)
-        massa_molar = x*12 + y*1  # g/mol
-        calor_liberado_kg = calor_liberado * 1000 / massa_molar  # kJ/kg
-        
-        # ===== EXIBIÇÃO DOS RESULTADOS =====
+        # RESULTADOS
         st.divider()
         st.markdown(
-            "<h2 style='text-align: center;'>Resultados</h2>",
+            "<h2 style='text-align: center;'>Resultados do Balanço Estequiométrico</h2>",
             unsafe_allow_html=True
         )
         st.divider()
@@ -251,9 +171,6 @@ if st.session_state.mostrar_esteq:
             st.markdown(f"**Condição:** {deficiencia_valor:.1f}% de deficiência de ar")
         else:
             st.markdown("**Condição:** Estequiométrica")
-        
-        # Mostra o tipo de poder calorífico selecionado
-        st.markdown(f"**Poder calorífico:** {tipo_calor}")
             
         st.divider()
         
@@ -294,43 +211,6 @@ if st.session_state.mostrar_esteq:
             """,
             unsafe_allow_html=True
         )
-        st.divider()
-        
-        # ===== CALOR DE COMBUSTÃO =====
-        st.markdown("### ➡️ Calor de Combustão")
-        
-        col_calor1, col_calor2, col_calor3 = st.columns(3)
-        
-        with col_calor1:
-            st.metric(
-                label=f"Calor liberado",
-                value=f"{calor_liberado:.1f} kJ/mol"
-            )
-        
-        with col_calor2:
-            st.metric(
-                label=f"Calor liberado",
-                value=f"{calor_liberado_kg:.1f} kJ/kg"
-            )
-        
-        with col_calor3:
-            st.metric(
-                label=f"Combustível",
-                value=f"C{'{'}{x}{'}'}H{'{'}{y}{'}'}"
-            )
-        
-        # Informações adicionais sobre o calor
-        with st.expander("📊 Detalhes do cálculo do calor"):
-            st.write(f"**Entalpia de formação do combustível:** {delta_hf_combustivel:.1f} kJ/mol")
-            st.write(f"**Entalpia dos produtos:** {delta_h_produtos:.1f} kJ/mol")
-            st.write(f"**ΔH da combustão:** {delta_h_combustao:.1f} kJ/mol")
-            st.write(f"**Massa molar do combustível:** {massa_molar:.1f} g/mol")
-            
-            if tipo_calor == "Poder Calorífico Superior (PCS)":
-                st.success("✅ Usando H₂O(l) nos produtos (PCS)")
-            else:
-                st.info("ℹ️ Usando H₂O(g) nos produtos (PCI)")
-        
         st.divider()
           
         # INFORMAÇÕES SOBRE AR
@@ -383,5 +263,283 @@ if st.session_state.mostrar_esteq:
                 st.info(f"**CO₂ formado:** {b:.2f} mol")
                 st.info(f"**H₂O formada:** {c:.2f} mol")
         
+        # ===== CÁLCULO DO CALOR (SE SELECIONADO) =====
+        if incluir_calor:
+            st.divider()
+            st.markdown("### ➡️ Calor de Combustão")
+            
+            # Opção de PCS/PCI
+            tipo_calor = st.radio(
+                "Tipo de poder calorífico:",
+                options=["PCS (água líquida)", "PCI (água vapor)"],
+                index=0,
+                horizontal=True
+            )
+            
+            # Entalpias de formação (kJ/mol) a 25°C
+            delta_hf = {
+                'CO2': -393.5,
+                'H2O_l': -285.8,
+                'H2O_g': -241.8,
+                'CO': -110.5,
+                'C': 0.0,
+                'O2': 0.0,
+                'N2': 0.0
+            }
+            
+            # Entalpia de formação do combustível
+            if x == 1 and y == 4:
+                delta_hf_combustivel = -74.8
+            elif x == 2 and y == 6:
+                delta_hf_combustivel = -84.7
+            elif x == 3 and y == 8:
+                delta_hf_combustivel = -103.8
+            elif x == 4 and y == 10:
+                delta_hf_combustivel = -126.1
+            elif x == 5 and y == 12:
+                delta_hf_combustivel = -146.8
+            elif x == 6 and y == 14:
+                delta_hf_combustivel = -167.2
+            elif x == 7 and y == 16:
+                delta_hf_combustivel = -187.8
+            elif x == 8 and y == 18:
+                delta_hf_combustivel = -208.4
+            elif x == 10 and y == 22:
+                delta_hf_combustivel = -249.6
+            else:
+                delta_hf_combustivel = -(20*x + 10*y)
+            
+            # Cálculo do calor
+            delta_h_produtos = 0
+            
+            if b > 0:
+                delta_h_produtos += b * delta_hf['CO2']
+            if co > 0:
+                delta_h_produtos += co * delta_hf['CO']
+            if carbono_solid > 0:
+                delta_h_produtos += carbono_solid * delta_hf['C']
+            if c > 0:
+                if tipo_calor == "PCS (água líquida)":
+                    delta_h_produtos += c * delta_hf['H2O_l']
+                else:
+                    delta_h_produtos += c * delta_hf['H2O_g']
+            
+            delta_h_reagentes = delta_hf_combustivel
+            delta_h_combustao = delta_h_produtos - delta_h_reagentes
+            calor_liberado = -delta_h_combustao
+            
+            massa_molar = x*12 + y*1
+            calor_liberado_kg = calor_liberado * 1000 / massa_molar
+            
+            col_calor1, col_calor2 = st.columns(2)
+            with col_calor1:
+                st.metric("Calor liberado", f"{calor_liberado:.1f} kJ/mol")
+            with col_calor2:
+                st.metric("Calor liberado", f"{calor_liberado_kg:.1f} kJ/kg")
+            
+            with st.expander("📊 Detalhes do cálculo"):
+                st.write(f"**ΔHf° do combustível:** {delta_hf_combustivel:.1f} kJ/mol")
+                st.write(f"**ΔH dos produtos:** {delta_h_produtos:.1f} kJ/mol")
+                st.write(f"**ΔH da combustão:** {delta_h_combustao:.1f} kJ/mol")
+                st.write(f"**Massa molar:** {massa_molar:.1f} g/mol")
+        
         st.divider()
-        st.caption("💡 Nota: Em condições de deficiência de ar, a combustão é incompleta e pode formar CO e/ou carbono sólido. O calor liberado será menor.")
+        st.caption("💡 Nota: Em condições de deficiência de ar, a combustão é incompleta e pode formar CO e/ou carbono sólido.")
+
+# =============================================
+# OPÇÃO 2: PODER CALORÍFICO
+# =============================================
+if st.session_state.mostrar_calor:
+    st.header("🔥 Cálculo do Poder Calorífico")
+    
+    st.markdown("""
+    ### Instruções
+    Digite a fórmula do combustível e escolha o tipo de poder calorífico desejado.
+    """)
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        x = st.number_input("Número de Carbonos:", min_value=1, value=1, step=1, key="calor_x")
+    with col2:
+        y = st.number_input("Número de Hidrogênios:", min_value=1, value=4, step=1, key="calor_y")
+    
+    st.write(f"**Combustível:** C<sub>{x}</sub>H<sub>{y}</sub>", unsafe_allow_html=True)
+    
+    st.divider()
+    
+    col_calor1, col_calor2 = st.columns(2)
+    
+    with col_calor1:
+        tipo_calor = st.radio(
+            "Tipo de poder calorífico:",
+            options=["Poder Calorífico Superior (PCS)", "Poder Calorífico Inferior (PCI)"],
+            index=0,
+            horizontal=True
+        )
+    
+    with col_calor2:
+        st.caption("📌 **PCS**: Água líquida nos produtos")
+        st.caption("📌 **PCI**: Água vapor nos produtos")
+    
+    if st.button("Calcular Poder Calorífico", use_container_width=True):
+        
+        # Entalpias de formação (kJ/mol) a 25°C
+        delta_hf = {
+            'CO2': -393.5,
+            'H2O_l': -285.8,
+            'H2O_g': -241.8,
+            'O2': 0.0,
+            'N2': 0.0
+        }
+        
+        # Entalpia de formação do combustível
+        if x == 1 and y == 4:
+            delta_hf_combustivel = -74.8
+            nome_combustivel = "Metano"
+        elif x == 2 and y == 6:
+            delta_hf_combustivel = -84.7
+            nome_combustivel = "Etano"
+        elif x == 3 and y == 8:
+            delta_hf_combustivel = -103.8
+            nome_combustivel = "Propano"
+        elif x == 4 and y == 10:
+            delta_hf_combustivel = -126.1
+            nome_combustivel = "Butano"
+        elif x == 5 and y == 12:
+            delta_hf_combustivel = -146.8
+            nome_combustivel = "Pentano"
+        elif x == 6 and y == 14:
+            delta_hf_combustivel = -167.2
+            nome_combustivel = "Hexano"
+        elif x == 7 and y == 16:
+            delta_hf_combustivel = -187.8
+            nome_combustivel = "Heptano"
+        elif x == 8 and y == 18:
+            delta_hf_combustivel = -208.4
+            nome_combustivel = "Octano"
+        elif x == 10 and y == 22:
+            delta_hf_combustivel = -249.6
+            nome_combustivel = "Decano"
+        else:
+            delta_hf_combustivel = -(20*x + 10*y)
+            nome_combustivel = f"C{'{'}{x}{'}'}H{'{'}{y}{'}'}"
+        
+        # Estequiometria para combustão completa
+        a = x + y/4  # O₂ necessário
+        b = x  # CO₂ produzido
+        c = y/2  # H₂O produzida
+        
+        # Cálculo do calor de combustão (Lei de Hess)
+        delta_h_produtos = b * delta_hf['CO2']
+        
+        if tipo_calor == "Poder Calorífico Superior (PCS)":
+            delta_h_produtos += c * delta_hf['H2O_l']
+            estado_agua = "líquida"
+        else:
+            delta_h_produtos += c * delta_hf['H2O_g']
+            estado_agua = "vapor"
+        
+        delta_h_reagentes = delta_hf_combustivel
+        delta_h_combustao = delta_h_produtos - delta_h_reagentes
+        calor_liberado = -delta_h_combustao  # kJ/mol
+        
+        # Conversão para kJ/kg
+        massa_molar = x*12 + y*1  # g/mol
+        calor_liberado_kg = calor_liberado * 1000 / massa_molar  # kJ/kg
+        
+        # Conversão para MJ/kg (mais comum para combustíveis)
+        calor_liberado_MJkg = calor_liberado_kg / 1000
+        
+        # RESULTADOS
+        st.divider()
+        st.markdown(
+            "<h2 style='text-align: center;'>Resultados do Poder Calorífico</h2>",
+            unsafe_allow_html=True
+        )
+        st.divider()
+        
+        # Informações do combustível
+        col_info1, col_info2, col_info3 = st.columns(3)
+        with col_info1:
+            st.metric("Combustível", f"C{'{'}{x}{'}'}H{'{'}{y}{'}'}")
+        with col_info2:
+            st.metric("Nome", nome_combustivel)
+        with col_info3:
+            st.metric("Massa molar", f"{massa_molar:.1f} g/mol")
+        
+        st.divider()
+        
+        # Reação de combustão
+        st.markdown("### ➡️ Reação de Combustão Completa")
+        reacao = f"C<sub>{x}</sub>H<sub>{y}</sub> + {a:.2f} O₂ → {b:.2f} CO₂ + {c:.2f} H₂O({estado_agua})"
+        
+        st.markdown(
+            f"""
+            <div style='
+                background-color: #f0f2f6;
+                padding: 20px;
+                border-radius: 10px;
+                border-left: 5px solid #ff4b4b;
+                font-size: 18px;
+                text-align: center;
+                font-family: 'Courier New', monospace;
+            '>
+                <b>{reacao}</b>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+        st.divider()
+        
+        # Resultados do poder calorífico
+        st.markdown("### ➡️ Poder Calorífico")
+        
+        col_res1, col_res2, col_res3 = st.columns(3)
+        with col_res1:
+            st.metric(
+                label=f"{tipo_calor}",
+                value=f"{calor_liberado:.1f} kJ/mol"
+            )
+        with col_res2:
+            st.metric(
+                label=f"{tipo_calor}",
+                value=f"{calor_liberado_kg:.1f} kJ/kg"
+            )
+        with col_res3:
+            st.metric(
+                label=f"{tipo_calor}",
+                value=f"{calor_liberado_MJkg:.2f} MJ/kg"
+            )
+        
+        st.divider()
+        
+        # Detalhes do cálculo
+        with st.expander("📊 Detalhes do Cálculo Termodinâmico"):
+            st.write("**Dados utilizados (ΔHf° a 25°C):**")
+            st.write(f"- Combustível (C{'{'}{x}{'}'}H{'{'}{y}{'}'}): {delta_hf_combustivel:.1f} kJ/mol")
+            st.write(f"- CO₂(g): {delta_hf['CO2']:.1f} kJ/mol")
+            if tipo_calor == "Poder Calorífico Superior (PCS)":
+                st.write(f"- H₂O(l): {delta_hf['H2O_l']:.1f} kJ/mol")
+            else:
+                st.write(f"- H₂O(g): {delta_hf['H2O_g']:.1f} kJ/mol")
+            st.write(f"- O₂(g): 0.0 kJ/mol")
+            
+            st.write("\n**Cálculo pela Lei de Hess:**")
+            st.write(f"ΔH_comb = Σ(n×ΔHf°_produtos) - Σ(n×ΔHf°_reagentes)")
+            st.write(f"ΔH_comb = ({b:.2f}×{delta_hf['CO2']:.1f} + {c:.2f}×{delta_hf_agua:.1f}) - ({delta_hf_combustivel:.1f})")
+            st.write(f"ΔH_comb = {delta_h_produtos:.1f} - ({delta_hf_combustivel:.1f}) = {delta_h_combustao:.1f} kJ/mol")
+            st.write(f"**Calor liberado = {calor_liberado:.1f} kJ/mol**")
+        
+        st.divider()
+        st.caption("💡 O poder calorífico é o calor liberado na combustão completa de 1 mol ou 1 kg de combustível.")
+
+# =============================================
+# MENSAGEM INICIAL (quando nenhuma opção está selecionada)
+# =============================================
+if not st.session_state.mostrar_esteq and not st.session_state.mostrar_calor:
+    st.info("👆 Selecione uma das opções acima para começar:")
+    st.markdown("""
+    - **Balanço Estequiométrico**: Calcule a quantidade de ar necessária, produtos formados e condições de combustão.
+    - **Poder Calorífico**: Calcule o calor liberado na combustão completa do combustível.
+    """)
