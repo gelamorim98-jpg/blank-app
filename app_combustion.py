@@ -433,12 +433,15 @@ if st.session_state.mostrar_calor:
         # Cálculo do calor de combustão (Lei de Hess)
         delta_h_produtos = b * delta_hf['CO2']
         
+        # Define o valor da entalpia da água baseado no tipo selecionado
         if tipo_calor == "Poder Calorífico Superior (PCS)":
             delta_h_produtos += c * delta_hf['H2O_l']
             estado_agua = "líquida"
+            delta_hf_agua = delta_hf['H2O_l']
         else:
             delta_h_produtos += c * delta_hf['H2O_g']
             estado_agua = "vapor"
+            delta_hf_agua = delta_hf['H2O_g']
         
         delta_h_reagentes = delta_hf_combustivel
         delta_h_combustao = delta_h_produtos - delta_h_reagentes
