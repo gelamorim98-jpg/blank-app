@@ -681,8 +681,7 @@ if st.session_state.mostrar_temp:
         # Capacidades caloríficas médias (kJ/mol·K) em função da temperatura
         # Aproximações para altas temperaturas
         def cp_CO2(T):
-            # T em Kelvin
-            return 0.044 + 0.000008 * (T - 298)  # kJ/mol·K
+            return 0.044 + 0.000008 * (T - 298)
         
         def cp_H2O(T):
             return 0.033 + 0.000007 * (T - 298)
@@ -709,8 +708,7 @@ if st.session_state.mostrar_temp:
             return calor
         
         # Método de iteração para encontrar T_adia
-        # Estimativa inicial
-        T_adia = T0 + 1000  # 1000 K acima da temperatura inicial
+        T_adia = T0 + 1000  # Estimativa inicial: 1000 K acima da temperatura inicial
         
         # Iteração (método de Newton simplificado)
         for _ in range(50):
@@ -733,14 +731,15 @@ if st.session_state.mostrar_temp:
         # Ajuste para dissociação (se selecionado)
         if considerar_dissociacao and T_adia > 2200:
             # Correção aproximada para dissociação
-            # A dissociação reduz a temperatura em cerca de 5-10%
             fator_dissociacao = 1 - 0.05 * (T_adia - 2200) / 1000
-            T_adia_diss = T_adia * max(fator_dissociacao, 0.85)
-            T_adia_final = T_adia_diss
+            T_adia_final = T_adia * max(fator_dissociacao, 0.85)
             dissociacao_aplicada = True
         else:
             T_adia_final = T_adia
             dissociacao_aplicada = False
+        
+        # Conversão para Celsius
+        T_adia_C = T_adia_final - 273.15
         
         # RESULTADOS
         st.divider()
@@ -781,4 +780,5 @@ if st.session_state.mostrar_temp:
         st.markdown(
             f"""
             <div style='
-               
+                background-color: #f0f2f6;
+                padding:
