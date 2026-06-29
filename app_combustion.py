@@ -241,16 +241,12 @@ if st.session_state.mostrar_esteq:
                 )
         st.divider()
         
-# =============================================
 # OPÇÃO 2: PODER CALORÍFICO
-# =============================================
+
 if st.session_state.mostrar_calor:
     st.header("🔥 Cálculo do Poder Calorífico")
     
-    st.markdown("""
-    ### Instruções
-    Digite a fórmula do combustível e escolha o tipo de poder calorífico desejado.
-    """)
+    st.markdown("""Digite a fórmula do combustível e escolha o tipo de poder calorífico desejado.""")
     
     col1, col2 = st.columns(2)
     
@@ -360,7 +356,7 @@ if st.session_state.mostrar_calor:
         # Informações do combustível
         col_info1, col_info2, col_info3 = st.columns(3)
         with col_info1:
-            st.metric("Combustível", f"C{'{'}{x}{'}'}H{'{'}{y}{'}'}")
+            st.metric("Combustível", f"C<sub>{x}</sub>H<sub>{y}</sub")
         with col_info2:
             st.metric("Nome", nome_combustivel)
         with col_info3:
