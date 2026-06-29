@@ -18,11 +18,11 @@ if "mostrar_esteq" not in st.session_state:
 if "mostrar_calor" not in st.session_state:
     st.session_state.mostrar_calor = False
 
-# BOTÕES DE NAVEGAÇÃO - ESCOLHA ENTRE AS OPÇÕES
+# BOTÕES DE NAVEGAÇÃO
 col_botao1, col_botao2 = st.columns(2)
 
 with col_botao1:
-    if st.button("🔬 Balanço Estequiométrico", use_container_width=True):
+    if st.button("👩‍🔬 Balanço Estequiométrico", use_container_width=True):
         st.session_state.mostrar_esteq = True
         st.session_state.mostrar_calor = False
 
@@ -33,11 +33,10 @@ with col_botao2:
 
 st.divider()
 
-# =============================================
 # OPÇÃO 1: BALANÇO ESTEQUIOMÉTRICO
-# =============================================
+
 if st.session_state.mostrar_esteq:
-    st.header("🔬 Balanço Estequiométrico")
+    st.header("👩‍🔬 Balanço Estequiométrico")
     
     col1, col2 = st.columns(2)
     
@@ -56,7 +55,7 @@ if st.session_state.mostrar_esteq:
     with col_ar1:
         tipo_ar = st.radio(
             "Tipo de condição:",
-            options=["Excesso de ar", "Deficiência de ar", "Estequiométrico"],
+            options=["Excesso de ar", "Deficiência de ar", "Ar teórico"],
             index=2,
             horizontal=True
         )
@@ -69,7 +68,7 @@ if st.session_state.mostrar_esteq:
                 min_value=1.0,
                 max_value=200.0,
                 value=20.0,
-                step=5.0,
+                step=1.0,
                 format="%.1f"
             )
             fator_excesso = 1 + excesso_valor / 100
@@ -80,17 +79,14 @@ if st.session_state.mostrar_esteq:
                 min_value=1.0,
                 max_value=80.0,
                 value=20.0,
-                step=5.0,
+                step=1.0,
                 format="%.1f"
             )
             fator_excesso = 1 - deficiencia_valor / 100
         
-        else:  # Estequiométrico
+        else:  # Ar Teórico
             fator_excesso = 1.0
-            st.info("✅ Condição estequiométrica (sem excesso ou deficiência de ar)")
-    
-    # Opção para incluir ou não o cálculo do calor
-    incluir_calor = st.checkbox("Calcular também o calor de combustão", value=False)
+            st.info("✅ Condição de ar teórico (sem excesso ou deficiência de ar)")
     
     if st.button("Calcular Estequiometria", use_container_width=True):
         
