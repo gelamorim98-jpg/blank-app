@@ -356,7 +356,7 @@ if st.session_state.mostrar_calor:
         # Informações do combustível
         col_info1, col_info2, col_info3 = st.columns(3)
         with col_info1:
-            st.metric("Combustível", f"(C{'{'}{x}{'}'}H{'{'}{y}{'}'})")
+            st.metric("Combustível", f"C{'{'}{x}{'}'}H{'{'}{y}{'}'}")
         with col_info2:
             st.metric("Nome", nome_combustivel)
         with col_info3:
