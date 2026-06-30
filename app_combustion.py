@@ -33,9 +33,7 @@ with col_botao2:
 
 st.divider()
 
-# =============================================
 # FUNÇÃO PARA CALCULAR Cp (capacidade calorífica)
-# =============================================
 
 def calcular_cp(gas, T):
     """
@@ -62,9 +60,7 @@ def calcular_cp(gas, T):
         return 30.0  # Valor aproximado para outros gases
 
 def calcular_cp_medio(gas, T1, T2):
-    """
-    Calcula o Cp médio entre T1 e T2 usando integração numérica
-    """
+    
     n_points = 100
     dt = (T2 - T1) / n_points
     soma_cp = 0
@@ -76,21 +72,9 @@ def calcular_cp_medio(gas, T1, T2):
     return soma_cp / n_points
 
 def calcular_temperatura_adiabatica(produtos, delta_h_combustao, T_inicial=298.15):
-    """
-    Calcula a temperatura adiabática de chama (sem dissociação)
-    
-    Parâmetros:
-    - produtos: dicionário {'CO2': n1, 'H2O': n2, 'N2': n3, 'O2': n4, 'CO': n5}
-    - delta_h_combustao: calor liberado na combustão (kJ/mol de combustível)
-    - T_inicial: temperatura inicial (K), padrão 298.15 K
-    
-    Retorna:
-    - T_ad: temperatura adiabática (K)
-    - T_ad_C: temperatura adiabática (°C)
-    """
-    
+       
     # Converter delta_h para J/mol
-    delta_h = delta_h_combustao * 1000  # kJ -> J
+    delta_h = delta_h_combustao * 1000  
     
     # Método iterativo para encontrar T_ad
     T_guess = 1500  # Chute inicial (K)
@@ -129,9 +113,7 @@ def calcular_temperatura_adiabatica(produtos, delta_h_combustao, T_inicial=298.1
     
     return T_ad, T_ad - 273.15
 
-# =============================================
 # OPÇÃO 1: BALANÇO ESTEQUIOMÉTRICO
-# =============================================
 
 if st.session_state.mostrar_esteq:
     st.header("👩‍🔬 Balanço Estequiométrico")
@@ -186,7 +168,6 @@ if st.session_state.mostrar_esteq:
             fator_excesso = 1.0
             st.info("✅ Condição de ar teórico (sem excesso ou deficiência de ar)")
     
-    # Checkbox para ativar cálculo da temperatura adiabática
     calcular_temp = st.checkbox("🌡️ Calcular Temperatura Adiabática de Chama (sem dissociação)")
     
     if st.button("Calcular Estequiometria", use_container_width=True):
@@ -203,7 +184,6 @@ if st.session_state.mostrar_esteq:
         else:
             razao_equivalencia = float('inf')
         
-        # Classificação da mistura baseada na razão de equivalência
         if razao_equivalencia == 1.0:
             classificacao_mistura = "✅ **Mistura Estequiométrica** (Φ = 1,0)"
             cor_mistura = "#28a745"
@@ -235,8 +215,7 @@ if st.session_state.mostrar_esteq:
                 co = x * 2
                 c = y/2
                 o2_residual = 0
-             
-            
+                         
             # Ajuste para quando não há O₂ suficiente nem para CO
             if co > 0 and a_real < y/4 + co/2:
                 o2_disponivel_co = a_real - y/4
@@ -261,10 +240,8 @@ if st.session_state.mostrar_esteq:
         # Ar real
         ar_real = a_real * 4.76
         
-        # =============================================
-        # CÁLCULO DA TEMPERATURA ADIABÁTICA DE CHAMA
-        # =============================================
-        
+       # CÁLCULO DA TEMPERATURA ADIABÁTICA DE CHAMA
+                
         if calcular_temp:
             # Produtos da combustão (apenas para temperatura adiabática)
             # Para ar teórico ou excesso: CO₂, H₂O, N₂, O₂
@@ -367,26 +344,7 @@ if st.session_state.mostrar_esteq:
                 """,
                 unsafe_allow_html=True
             )
-        
-        with st.expander("📖 O que é a Razão de Equivalência?"):
-            st.markdown("""
-            A **Razão de Equivalência (Φ)** é definida como:
             
-            $$
-            \\Phi = \\frac{(F/A)_{real}}{(F/A)_{estequiométrica}} = \\frac{a_{teórico}}{a_{real}}
-            $$
-            
-            Onde:
-            - **(F/A)** = razão combustível/ar
-            - **a_teórico** = O₂ necessário para combustão estequiométrica
-            - **a_real** = O₂ realmente fornecido
-            
-            **Interpretação:**
-            - **Φ = 1,0** → Mistura estequiométrica (combustão completa)
-            - **Φ < 1,0** → Mistura pobre (excesso de ar, O₂ em excesso)
-            - **Φ > 1,0** → Mistura rica (deficiência de ar, combustível em excesso)
-            """)
-        
         st.divider()
         
         st.markdown("### ➡️ Reação Global Balanceada")
@@ -426,12 +384,10 @@ if st.session_state.mostrar_esteq:
         )
         st.divider()
         
-        # =============================================
         # TEMPERATURA ADIABÁTICA DE CHAMA
-        # =============================================
         
         if calcular_temp:
-            st.markdown("### 🌡️ Temperatura Adiabática de Chama (sem dissociação)")
+            st.markdown("### ➡️ Temperatura Adiabática de Chama (sem dissociação)")
             
             col_temp1, col_temp2 = st.columns(2)
             
@@ -448,33 +404,7 @@ if st.session_state.mostrar_esteq:
                     value=f"{T_ad_simplificado:.1f} K",
                     delta=f"{T_ad_simplificado_C:.1f} °C"
                 )
-            
-            # Explicação detalhada
-            with st.expander("📊 Detalhes do Cálculo da Temperatura Adiabática"):
-                st.write("**Método:** Cálculo iterativo com Cp variável com a temperatura")
-                st.write(f"- Temperatura inicial: 298,15 K")
-                st.write(f"- Calor liberado: {calor_liberado:.1f} kJ/mol")
-                st.write(f"- Número de iterações: convergiu para {T_ad:.1f} K")
-                
-                st.write("\n**Produtos considerados no aquecimento:**")
-                for gas, n_mols in produtos.items():
-                    st.write(f"- {gas}: {n_mols:.4f} mol")
-                
-                st.write("\n**Equação utilizada:**")
-                st.latex(r"T_{ad} = T_0 + \frac{-\Delta H_{comb}}{\sum n_i \cdot \overline{Cp_i}}")
-                
-                st.write("\n**Limitações do modelo:**")
-                st.warning("""
-                ⚠️ Este cálculo **NÃO considera dissociação molecular** em altas temperaturas.
-                
-                A temperatura real de chama é **significativamente menor** devido a:
-                - Dissociação de CO₂ → CO + ½O₂ (absorve calor)
-                - Dissociação de H₂O → H₂ + ½O₂ (absorve calor)
-                - Dissociação de N₂ → 2N (absorve calor)
-                
-                Para combustíveis comuns, a temperatura real é cerca de **2000-3000 K** menor.
-                """)
-            
+                               
             st.divider()
         
         # INFORMAÇÕES SOBRE AR
