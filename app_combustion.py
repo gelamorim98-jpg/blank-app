@@ -284,8 +284,8 @@ if st.session_state.mostrar_calor:
             nome_combustivel = "Metano"
         elif x == 2 and y == 2:
             delta_hf_combustivel = 226.73
-            nome_combustivel = "Acetileno"  
-         elif x == 2 and y == 4:
+            nome_combustivel = "Acetileno" 
+        elif x == 2 and y == 4:
             delta_hf_combustivel = 52.28
             nome_combustivel = "Etileno"  
         elif x == 2 and y == 6:
