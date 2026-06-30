@@ -180,39 +180,9 @@ if st.session_state.mostrar_esteq:
             st.markdown("**Condição:** Ar teórico")
             
         st.divider()
-        
-        # =============================================
-        # NOVO: RAZÃO DE EQUIVALÊNCIA
-        # =============================================
-        st.markdown("### ⚖️ Razão de Equivalência (Φ)")
-        
-        col_phi1, col_phi2, col_phi3 = st.columns([1, 2, 1])
-        with col_phi2:
-            st.markdown(
-                f"""
-                <div style='
-                    background-color: {cor_mistura}20;
-                    padding: 15px;
-                    border-radius: 10px;
-                    border: 2px solid {cor_mistura};
-                    text-align: center;
-                '>
-                    <h3 style='color: {cor_mistura}; margin: 0;'>
-                        Φ = {razao_equivalencia:.4f}
-                    </h3>
-                    <p style='margin: 5px 0 0 0; font-size: 16px;'>
-                        {classificacao_mistura}
-                    </p>
-                </div>
-                """,
-                unsafe_allow_html=True
-            )
-        
-        st.divider()
-        
+               
         st.markdown("### ➡️ Reação Global Balanceada")
         
-        # Construindo a equação da reação
         reacao = f"C<sub>{x}</sub>H<sub>{y}</sub> + {a_real:.2f}(O₂ + 3,76 N₂) → "
         
         produtos = []
@@ -246,8 +216,33 @@ if st.session_state.mostrar_esteq:
             unsafe_allow_html=True
         )
         st.divider()
-          
-        # INFORMAÇÕES SOBRE AR
+
+        st.markdown("### ➡️ Razão de Equivalência (Φ)")
+        
+        col_phi1, col_phi2, col_phi3 = st.columns([1, 2, 1])
+        with col_phi2:
+            st.markdown(
+                f"""
+                <div style='
+                    background-color: {cor_mistura}20;
+                    padding: 15px;
+                    border-radius: 10px;
+                    border: 2px solid {cor_mistura};
+                    text-align: center;
+                '>
+                    <h3 style='color: {cor_mistura}; margin: 0;'>
+                        Φ = {razao_equivalencia:.4f}
+                    </h3>
+                    <p style='margin: 5px 0 0 0; font-size: 16px;'>
+                        {classificacao_mistura}
+                    </p>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+        
+        st.divider()
+       
         st.markdown("### ➡️ Informações sobre o Ar")
         
         col_ar1, col_ar2, col_ar3, col_ar4 = st.columns(4)
