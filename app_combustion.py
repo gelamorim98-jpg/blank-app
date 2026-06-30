@@ -110,7 +110,7 @@ if st.session_state.mostrar_esteq:
             classificacao_mistura = "✅ **Mistura Estequiométrica** (Φ = 1,0)"
             cor_mistura = "#28a745"  # Verde
         elif razao_equivalencia < 1.0:
-            classificacao_mistura = f"🟢 **Mistura Pobre** (Φ = {razao_equivalencia:.3f} < 1,0) - Excesso de ar"
+            classificacao_mistura = f"🔵 **Mistura Pobre** (Φ = {razao_equivalencia:.3f} < 1,0) - Excesso de ar"
             cor_mistura = "#17a2b8"  # Azul
         else:
             classificacao_mistura = f"🔴 **Mistura Rica** (Φ = {razao_equivalencia:.3f} > 1,0) - Deficiência de ar"
