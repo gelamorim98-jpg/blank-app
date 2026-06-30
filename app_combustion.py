@@ -208,31 +208,6 @@ if st.session_state.mostrar_esteq:
                 unsafe_allow_html=True
             )
         
-        # Explicação da razão de equivalência
-        with st.expander("📖 O que é a Razão de Equivalência?"):
-            st.markdown("""
-            A **Razão de Equivalência (Φ)** é definida como:
-            
-            $$
-            \\Phi = \\frac{(F/A)_{real}}{(F/A)_{estequiométrica}} = \\frac{a_{teórico}}{a_{real}}
-            $$
-            
-            Onde:
-            - **(F/A)** = razão combustível/ar
-            - **a_teórico** = O₂ necessário para combustão estequiométrica
-            - **a_real** = O₂ realmente fornecido
-            
-            **Interpretação:**
-            - **Φ = 1,0** → Mistura estequiométrica (combustão completa)
-            - **Φ < 1,0** → Mistura pobre (excesso de ar, O₂ em excesso)
-            - **Φ > 1,0** → Mistura rica (deficiência de ar, combustível em excesso)
-            
-            💡 A razão de equivalência é fundamental em processos de combustão para:
-            - Controle de emissões poluentes
-            - Otimização da eficiência de queima
-            - Projeto de motores e queimadores
-            """)
-        
         st.divider()
         
         st.markdown("### ➡️ Reação Global Balanceada")
@@ -309,9 +284,6 @@ if st.session_state.mostrar_esteq:
                 )
         st.divider()
         
-        # =============================================
-        # NOVO: RESUMO DOS PARÂMETROS DE COMBUSTÃO
-        # =============================================
         st.markdown("### 📊 Resumo dos Parâmetros de Combustão")
         
         col_res1, col_res2, col_res3, col_res4 = st.columns(4)
@@ -328,7 +300,7 @@ if st.session_state.mostrar_esteq:
         with col_res3:
             st.metric(
                 label="Razão de Equivalência (Φ)",
-                value=f"{razao_equivalencia:.4f}"
+                value=f"{razao_equivalencia:.2f}"
             )
         with col_res4:
             if razao_equivalencia == 1.0:
