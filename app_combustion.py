@@ -271,38 +271,47 @@ if st.session_state.mostrar_calor:
         
         # Entalpias de formação (kJ/mol) a 25°C
         delta_hf = {
-            'CO2': -393.5,
-            'H2O_l': -285.8,
-            'H2O_g': -241.8,
+            'CO2': -393.52,
+            'H2O_l': -285.83,
+            'H2O_g': -241.82,
             'O2': 0.0,
             'N2': 0.0
         }
         
         # Entalpia de formação do combustível
         if x == 1 and y == 4:
-            delta_hf_combustivel = -74.8
+            delta_hf_combustivel = -74.85
             nome_combustivel = "Metano"
+        elif x == 2 and y == 2:
+            delta_hf_combustivel = 226.73
+            nome_combustivel = "Acetileno"  
+         elif x == 2 and y == 4:
+            delta_hf_combustivel = 52.28
+            nome_combustivel = "Etileno"  
         elif x == 2 and y == 6:
-            delta_hf_combustivel = -84.7
+            delta_hf_combustivel = -84.68
             nome_combustivel = "Etano"
+        elif x == 3 and y == 6:
+            delta_hf_combustivel = 20.41
+            nome_combustivel = "Propileno"
         elif x == 3 and y == 8:
-            delta_hf_combustivel = -103.8
+            delta_hf_combustivel = -103.85
             nome_combustivel = "Propano"
         elif x == 4 and y == 10:
-            delta_hf_combustivel = -126.1
+            delta_hf_combustivel = -126.15
             nome_combustivel = "Butano"
         elif x == 5 and y == 12:
-            delta_hf_combustivel = -146.8
+            delta_hf_combustivel = -146.44
             nome_combustivel = "Pentano"
-        elif x == 6 and y == 14:
-            delta_hf_combustivel = -167.2
-            nome_combustivel = "Hexano"
+        elif x == 8 and y == 18:
+            delta_hf_combustivel = -208.45
+            nome_combustivel = "Octano Gasoso"
+        elif x == 8 and y == 18:
+            delta_hf_combustivel = 82.93
+            nome_combustivel = "Benzeno"
         elif x == 7 and y == 16:
             delta_hf_combustivel = -187.8
             nome_combustivel = "Heptano"
-        elif x == 8 and y == 18:
-            delta_hf_combustivel = -208.4
-            nome_combustivel = "Octano"
         elif x == 10 and y == 22:
             delta_hf_combustivel = -249.6
             nome_combustivel = "Decano"
