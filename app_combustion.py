@@ -171,8 +171,6 @@ if st.session_state.mostrar_esteq:
             produtos.append(f"{b:.2f} CO₂")
         if co > 0:
             produtos.append(f"{co:.2f} CO")
-        if carbono_solid > 0:
-            produtos.append(f"{carbono_solid:.2f} C")
         if c > 0:
             produtos.append(f"{c:.2f} H₂O")
         if d > 0:
