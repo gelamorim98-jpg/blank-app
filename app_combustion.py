@@ -96,6 +96,26 @@ if st.session_state.mostrar_esteq:
         # Aplicando o fator de excesso/deficiência
         a_real = a_teorico * fator_excesso
         
+        # CÁLCULO DA RAZÃO DE EQUIVALÊNCIA (Φ)
+        # Φ = (Razão combustível/ar real) / (Razão combustível/ar estequiométrica)
+        # Φ = a_teorico / a_real
+        
+        if a_real > 0:
+            razao_equivalencia = a_teorico / a_real
+        else:
+            razao_equivalencia = float('inf')
+        
+        # Classificação da mistura baseada na razão de equivalência
+        if razao_equivalencia == 1.0:
+            classificacao_mistura = "✅ **Mistura Estequiométrica** (Φ = 1,0)"
+            cor_mistura = "#28a745"  # Verde
+        elif razao_equivalencia < 1.0:
+            classificacao_mistura = f"🟢 **Mistura Pobre** (Φ = {razao_equivalencia:.3f} < 1,0) - Excesso de ar"
+            cor_mistura = "#17a2b8"  # Azul
+        else:
+            classificacao_mistura = f"🔴 **Mistura Rica** (Φ = {razao_equivalencia:.3f} > 1,0) - Deficiência de ar"
+            cor_mistura = "#dc3545"  # Vermelho
+        
         # b = CO₂ produzido (depende se há deficiência de ar)
         if fator_excesso < 1:
             o2_para_c = a_real - (y/4)
@@ -159,6 +179,60 @@ if st.session_state.mostrar_esteq:
         else:
             st.markdown("**Condição:** Ar teórico")
             
+        st.divider()
+        
+        # =============================================
+        # NOVO: RAZÃO DE EQUIVALÊNCIA
+        # =============================================
+        st.markdown("### ⚖️ Razão de Equivalência (Φ)")
+        
+        col_phi1, col_phi2, col_phi3 = st.columns([1, 2, 1])
+        with col_phi2:
+            st.markdown(
+                f"""
+                <div style='
+                    background-color: {cor_mistura}20;
+                    padding: 15px;
+                    border-radius: 10px;
+                    border: 2px solid {cor_mistura};
+                    text-align: center;
+                '>
+                    <h3 style='color: {cor_mistura}; margin: 0;'>
+                        Φ = {razao_equivalencia:.4f}
+                    </h3>
+                    <p style='margin: 5px 0 0 0; font-size: 16px;'>
+                        {classificacao_mistura}
+                    </p>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+        
+        # Explicação da razão de equivalência
+        with st.expander("📖 O que é a Razão de Equivalência?"):
+            st.markdown("""
+            A **Razão de Equivalência (Φ)** é definida como:
+            
+            $$
+            \\Phi = \\frac{(F/A)_{real}}{(F/A)_{estequiométrica}} = \\frac{a_{teórico}}{a_{real}}
+            $$
+            
+            Onde:
+            - **(F/A)** = razão combustível/ar
+            - **a_teórico** = O₂ necessário para combustão estequiométrica
+            - **a_real** = O₂ realmente fornecido
+            
+            **Interpretação:**
+            - **Φ = 1,0** → Mistura estequiométrica (combustão completa)
+            - **Φ < 1,0** → Mistura pobre (excesso de ar, O₂ em excesso)
+            - **Φ > 1,0** → Mistura rica (deficiência de ar, combustível em excesso)
+            
+            💡 A razão de equivalência é fundamental em processos de combustão para:
+            - Controle de emissões poluentes
+            - Otimização da eficiência de queima
+            - Projeto de motores e queimadores
+            """)
+        
         st.divider()
         
         st.markdown("### ➡️ Reação Global Balanceada")
@@ -234,6 +308,47 @@ if st.session_state.mostrar_esteq:
                     value="0.00 mol"
                 )
         st.divider()
+        
+        # =============================================
+        # NOVO: RESUMO DOS PARÂMETROS DE COMBUSTÃO
+        # =============================================
+        st.markdown("### 📊 Resumo dos Parâmetros de Combustão")
+        
+        col_res1, col_res2, col_res3, col_res4 = st.columns(4)
+        with col_res1:
+            st.metric(
+                label="O₂ teórico (mol)",
+                value=f"{a_teorico:.2f} mol"
+            )
+        with col_res2:
+            st.metric(
+                label="O₂ real (mol)",
+                value=f"{a_real:.2f} mol"
+            )
+        with col_res3:
+            st.metric(
+                label="Razão de Equivalência (Φ)",
+                value=f"{razao_equivalencia:.4f}"
+            )
+        with col_res4:
+            if razao_equivalencia == 1.0:
+                st.metric(
+                    label="Classificação",
+                    value="Estequiométrica",
+                    delta="✅ Ideal"
+                )
+            elif razao_equivalencia < 1.0:
+                st.metric(
+                    label="Classificação",
+                    value="Pobre",
+                    delta="🔵 Excesso de ar"
+                )
+            else:
+                st.metric(
+                    label="Classificação",
+                    value="Rica",
+                    delta="🔴 Deficiência de ar"
+                )
         
 # OPÇÃO 2: PODER CALORÍFICO
 
