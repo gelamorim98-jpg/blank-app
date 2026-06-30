@@ -105,19 +105,19 @@ if st.session_state.mostrar_esteq:
                 c = y/2
                 co = 0
                 o2_residual = max(0, o2_para_c - x)
-                carbono_solid = 0
+              
             elif o2_para_c > 0:
                 b = o2_para_c
                 co = (x - b) * 2
                 c = y/2
                 o2_residual = 0
-                carbono_solid = 0
+              
             else:
                 b = 0
                 co = x * 2
                 c = y/2
                 o2_residual = 0
-                carbono_solid = 0
+             
             
             # Ajuste para quando não há O₂ suficiente nem para CO
             if co > 0 and a_real < y/4 + co/2:
@@ -125,21 +125,20 @@ if st.session_state.mostrar_esteq:
                 if o2_disponivel_co > 0:
                     co = o2_disponivel_co * 2
                     b = 0
-                    carbono_solid = x - co/2
+                  
                 else:
                     co = 0
-                    carbono_solid = x
+                  
             else:
                 if carbono_solid == 0 and co > 0 and b == 0:
-                    carbono_solid = max(0, x - co/2)
-                
+                                   
         else:
             # Estequiométrico ou excesso de ar
             b = x
             c = y/2
             co = 0
             o2_residual = max(0, a_real - a_teorico)
-            carbono_solid = 0
+          
         
         # N₂ produtos
         d = 3.76 * a_real
