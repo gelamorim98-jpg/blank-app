@@ -33,7 +33,105 @@ with col_botao2:
 
 st.divider()
 
+# =============================================
+# FUNÇÃO PARA CALCULAR Cp (capacidade calorífica)
+# =============================================
+
+def calcular_cp(gas, T):
+    """
+    Calcula a capacidade calorífica molar (Cp) em J/mol·K
+    para diferentes gases em função da temperatura (K)
+    """
+    # Coeficientes para Cp = a + b*T + c*T² + d*T³ (T em K)
+    # Valores em J/mol·K
+    coeficientes = {
+        'CO2': {'a': 22.26, 'b': 5.98e-3, 'c': -3.50e-6, 'd': 7.47e-9},
+        'H2O': {'a': 32.24, 'b': 1.92e-3, 'c': 1.06e-5, 'd': -3.60e-9},
+        'N2': {'a': 28.90, 'b': -1.57e-3, 'c': 0.81e-5, 'd': -2.87e-9},
+        'O2': {'a': 25.48, 'b': 1.52e-3, 'c': -0.72e-5, 'd': 1.31e-9},
+        'CO': {'a': 28.95, 'b': -0.41e-3, 'c': 0.51e-5, 'd': -2.28e-9}
+    }
+    
+    if gas in coeficientes:
+        a = coeficientes[gas]['a']
+        b = coeficientes[gas]['b']
+        c = coeficientes[gas]['c']
+        d = coeficientes[gas]['d']
+        return a + b*T + c*T**2 + d*T**3
+    else:
+        return 30.0  # Valor aproximado para outros gases
+
+def calcular_cp_medio(gas, T1, T2):
+    """
+    Calcula o Cp médio entre T1 e T2 usando integração numérica
+    """
+    n_points = 100
+    dt = (T2 - T1) / n_points
+    soma_cp = 0
+    
+    for i in range(n_points):
+        T = T1 + i * dt + dt/2
+        soma_cp += calcular_cp(gas, T)
+    
+    return soma_cp / n_points
+
+def calcular_temperatura_adiabatica(produtos, delta_h_combustao, T_inicial=298.15):
+    """
+    Calcula a temperatura adiabática de chama (sem dissociação)
+    
+    Parâmetros:
+    - produtos: dicionário {'CO2': n1, 'H2O': n2, 'N2': n3, 'O2': n4, 'CO': n5}
+    - delta_h_combustao: calor liberado na combustão (kJ/mol de combustível)
+    - T_inicial: temperatura inicial (K), padrão 298.15 K
+    
+    Retorna:
+    - T_ad: temperatura adiabática (K)
+    - T_ad_C: temperatura adiabática (°C)
+    """
+    
+    # Converter delta_h para J/mol
+    delta_h = delta_h_combustao * 1000  # kJ -> J
+    
+    # Método iterativo para encontrar T_ad
+    T_guess = 1500  # Chute inicial (K)
+    tolerancia = 1.0  # Tolerância em K
+    max_iter = 50
+    
+    for iteracao in range(max_iter):
+        # Calcular calor sensível para aquecer produtos de T_inicial até T_guess
+        calor_sensivel = 0
+        
+        for gas, n_mols in produtos.items():
+            if n_mols > 0 and gas in ['CO2', 'H2O', 'N2', 'O2', 'CO']:
+                cp_medio = calcular_cp_medio(gas, T_inicial, T_guess)
+                calor_sensivel += n_mols * cp_medio * (T_guess - T_inicial)
+            elif n_mols > 0:
+                # Para gases não listados, usar Cp aproximado
+                cp_medio = 30.0  # J/mol·K
+                calor_sensivel += n_mols * cp_medio * (T_guess - T_inicial)
+        
+        # Calcular T pela equação: delta_h = calor_sensivel
+        if calor_sensivel > 0:
+            T_novo = T_inicial + delta_h / (calor_sensivel / (T_guess - T_inicial))
+        else:
+            T_novo = T_guess * 1.5
+        
+        # Verificar convergência
+        if abs(T_novo - T_guess) < tolerancia:
+            T_ad = T_novo
+            break
+        
+        T_guess = T_novo
+    
+    else:
+        # Se não convergiu, usar o último valor
+        T_ad = T_guess
+    
+    return T_ad, T_ad - 273.15
+
+# =============================================
 # OPÇÃO 1: BALANÇO ESTEQUIOMÉTRICO
+# =============================================
 
 if st.session_state.mostrar_esteq:
     st.header("👩‍🔬 Balanço Estequiométrico")
@@ -88,6 +186,9 @@ if st.session_state.mostrar_esteq:
             fator_excesso = 1.0
             st.info("✅ Condição de ar teórico (sem excesso ou deficiência de ar)")
     
+    # Checkbox para ativar cálculo da temperatura adiabática
+    calcular_temp = st.checkbox("🌡️ Calcular Temperatura Adiabática de Chama (sem dissociação)")
+    
     if st.button("Calcular Estequiometria", use_container_width=True):
         
         # CÁLCULOS ESTEQUIOMÉTRICOS (ar teórico)
@@ -97,9 +198,6 @@ if st.session_state.mostrar_esteq:
         a_real = a_teorico * fator_excesso
         
         # CÁLCULO DA RAZÃO DE EQUIVALÊNCIA (Φ)
-        # Φ = (Razão combustível/ar real) / (Razão combustível/ar estequiométrica)
-        # Φ = a_teorico / a_real
-        
         if a_real > 0:
             razao_equivalencia = a_teorico / a_real
         else:
@@ -108,13 +206,13 @@ if st.session_state.mostrar_esteq:
         # Classificação da mistura baseada na razão de equivalência
         if razao_equivalencia == 1.0:
             classificacao_mistura = "✅ **Mistura Estequiométrica** (Φ = 1,0)"
-            cor_mistura = "#28a745"  # Verde
+            cor_mistura = "#28a745"
         elif razao_equivalencia < 1.0:
-            classificacao_mistura = f"🔵 **Mistura Pobre** (Φ = {razao_equivalencia:.3f} < 1,0) - Excesso de ar"
-            cor_mistura = "#17a2b8"  # Azul
+            classificacao_mistura = f"🟢 **Mistura Pobre** (Φ = {razao_equivalencia:.3f} < 1,0) - Excesso de ar"
+            cor_mistura = "#17a2b8"
         else:
             classificacao_mistura = f"🔴 **Mistura Rica** (Φ = {razao_equivalencia:.3f} > 1,0) - Deficiência de ar"
-            cor_mistura = "#dc3545"  # Vermelho
+            cor_mistura = "#dc3545"
         
         # b = CO₂ produzido (depende se há deficiência de ar)
         if fator_excesso < 1:
@@ -163,52 +261,90 @@ if st.session_state.mostrar_esteq:
         # Ar real
         ar_real = a_real * 4.76
         
+        # =============================================
+        # CÁLCULO DA TEMPERATURA ADIABÁTICA DE CHAMA
+        # =============================================
+        
+        if calcular_temp:
+            # Produtos da combustão (apenas para temperatura adiabática)
+            # Para ar teórico ou excesso: CO₂, H₂O, N₂, O₂
+            # Para deficiência: CO₂, CO, H₂O, N₂
+            produtos = {}
+            
+            if b > 0:
+                produtos['CO2'] = b
+            if co > 0:
+                produtos['CO'] = co
+            if c > 0:
+                produtos['H2O'] = c
+            if d > 0:
+                produtos['N2'] = d
+            if o2_residual > 0:
+                produtos['O2'] = o2_residual
+            
+            # Entalpia de combustão (calor liberado em kJ/mol)
+            # Usar valor aproximado baseado na fórmula do combustível
+            # ΔH_comb ≈ - (a_teorico * 393.5 + c * 241.8 - delta_hf_combustivel)
+            # Estimativa simplificada para hidrocarbonetos
+            
+            # Entalpia de formação aproximada do combustível (kJ/mol)
+            delta_hf_combustivel = -(20*x + 10*y)  # Estimativa para alcanos
+            
+            # Entalpia dos produtos (CO₂ e H₂O)
+            delta_hf_CO2 = -393.5  # kJ/mol
+            delta_hf_H2O = -241.8  # kJ/mol (vapor)
+            delta_hf_CO = -110.5   # kJ/mol
+            
+            delta_h_produtos = 0
+            if b > 0:
+                delta_h_produtos += b * delta_hf_CO2
+            if co > 0:
+                delta_h_produtos += co * delta_hf_CO
+            if c > 0:
+                delta_h_produtos += c * delta_hf_H2O
+            
+            delta_h_combustao = delta_h_produtos - delta_hf_combustivel
+            calor_liberado = -delta_h_combustao  # kJ/mol
+            
+            # Calcular temperatura adiabática
+            T_ad, T_ad_C = calcular_temperatura_adiabatica(produtos, calor_liberado)
+            
+            # Calcular também para comparação com Cp constante
+            # Método simplificado (Cp constante)
+            cp_produtos_total = 0
+            cp_constantes = {'CO2': 44.0, 'H2O': 33.6, 'N2': 29.1, 'O2': 29.4, 'CO': 29.1}
+            
+            for gas, n_mols in produtos.items():
+                if gas in cp_constantes:
+                    cp_produtos_total += n_mols * cp_constantes[gas] / 1000  # J -> kJ
+            
+            if cp_produtos_total > 0:
+                T_ad_simplificado = 298.15 + calor_liberado / cp_produtos_total
+                T_ad_simplificado_C = T_ad_simplificado - 273.15
+            else:
+                T_ad_simplificado = 298.15
+                T_ad_simplificado_C = 25.0
+        
         # RESULTADOS
         st.divider()
         st.markdown(
             "<h2 style='text-align: center;'>Resultados do Balanço Estequiométrico</h2>",
             unsafe_allow_html=True
         )
-                   
         st.divider()
-               
-        st.markdown("### ➡️ Reação Global Balanceada")
         
-        reacao = f"C<sub>{x}</sub>H<sub>{y}</sub> + {a_real:.2f}(O₂ + 3,76 N₂) → "
-        
-        produtos = []
-        if b > 0:
-            produtos.append(f"{b:.2f} CO₂")
-        if co > 0:
-            produtos.append(f"{co:.2f} CO")
-        if c > 0:
-            produtos.append(f"{c:.2f} H₂O")
-        if d > 0:
-            produtos.append(f"{d:.2f} N₂")
-        if o2_residual > 0:
-            produtos.append(f"{o2_residual:.2f} O₂")
+        # Mostra condição atual
+        if tipo_ar == "Excesso de ar":
+            st.markdown(f"**Condição:** {excesso_valor:.1f}% de excesso de ar")
+        elif tipo_ar == "Deficiência de ar":
+            st.markdown(f"**Condição:** {deficiencia_valor:.1f}% de deficiência de ar")
+        else:
+            st.markdown("**Condição:** Ar teórico")
             
-        reacao += " + ".join(produtos)
-        
-        st.markdown(
-            f"""
-            <div style='
-                background-color: #f0f2f6;
-                padding: 20px;
-                border-radius: 10px;
-                border-left: 5px solid #ff4b4b;
-                font-size: 18px;
-                text-align: center;
-                font-family: 'Courier New', monospace;
-            '>
-                <b>{reacao}</b>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
         st.divider()
-
-        st.markdown("### ➡️ Razão de Equivalência (Φ)")
+        
+        # RAZÃO DE EQUIVALÊNCIA
+        st.markdown("### ⚖️ Razão de Equivalência (Φ)")
         
         col_phi1, col_phi2, col_phi3 = st.columns([1, 2, 1])
         with col_phi2:
@@ -232,8 +368,116 @@ if st.session_state.mostrar_esteq:
                 unsafe_allow_html=True
             )
         
+        with st.expander("📖 O que é a Razão de Equivalência?"):
+            st.markdown("""
+            A **Razão de Equivalência (Φ)** é definida como:
+            
+            $$
+            \\Phi = \\frac{(F/A)_{real}}{(F/A)_{estequiométrica}} = \\frac{a_{teórico}}{a_{real}}
+            $$
+            
+            Onde:
+            - **(F/A)** = razão combustível/ar
+            - **a_teórico** = O₂ necessário para combustão estequiométrica
+            - **a_real** = O₂ realmente fornecido
+            
+            **Interpretação:**
+            - **Φ = 1,0** → Mistura estequiométrica (combustão completa)
+            - **Φ < 1,0** → Mistura pobre (excesso de ar, O₂ em excesso)
+            - **Φ > 1,0** → Mistura rica (deficiência de ar, combustível em excesso)
+            """)
+        
         st.divider()
-       
+        
+        st.markdown("### ➡️ Reação Global Balanceada")
+        
+        # Construindo a equação da reação
+        reacao = f"C<sub>{x}</sub>H<sub>{y}</sub> + {a_real:.2f}(O₂ + 3,76 N₂) → "
+        
+        produtos_lista = []
+        if b > 0:
+            produtos_lista.append(f"{b:.2f} CO₂")
+        if co > 0:
+            produtos_lista.append(f"{co:.2f} CO")
+        if c > 0:
+            produtos_lista.append(f"{c:.2f} H₂O")
+        if d > 0:
+            produtos_lista.append(f"{d:.2f} N₂")
+        if o2_residual > 0:
+            produtos_lista.append(f"{o2_residual:.2f} O₂")
+            
+        reacao += " + ".join(produtos_lista)
+        
+        st.markdown(
+            f"""
+            <div style='
+                background-color: #f0f2f6;
+                padding: 20px;
+                border-radius: 10px;
+                border-left: 5px solid #ff4b4b;
+                font-size: 18px;
+                text-align: center;
+                font-family: 'Courier New', monospace;
+            '>
+                <b>{reacao}</b>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+        st.divider()
+        
+        # =============================================
+        # TEMPERATURA ADIABÁTICA DE CHAMA
+        # =============================================
+        
+        if calcular_temp:
+            st.markdown("### 🌡️ Temperatura Adiabática de Chama (sem dissociação)")
+            
+            col_temp1, col_temp2 = st.columns(2)
+            
+            with col_temp1:
+                st.metric(
+                    label="Temperatura Adiabática (Cp variável)",
+                    value=f"{T_ad:.1f} K",
+                    delta=f"{T_ad_C:.1f} °C"
+                )
+            
+            with col_temp2:
+                st.metric(
+                    label="Temperatura Adiabática (Cp constante - estimativa)",
+                    value=f"{T_ad_simplificado:.1f} K",
+                    delta=f"{T_ad_simplificado_C:.1f} °C"
+                )
+            
+            # Explicação detalhada
+            with st.expander("📊 Detalhes do Cálculo da Temperatura Adiabática"):
+                st.write("**Método:** Cálculo iterativo com Cp variável com a temperatura")
+                st.write(f"- Temperatura inicial: 298,15 K")
+                st.write(f"- Calor liberado: {calor_liberado:.1f} kJ/mol")
+                st.write(f"- Número de iterações: convergiu para {T_ad:.1f} K")
+                
+                st.write("\n**Produtos considerados no aquecimento:**")
+                for gas, n_mols in produtos.items():
+                    st.write(f"- {gas}: {n_mols:.4f} mol")
+                
+                st.write("\n**Equação utilizada:**")
+                st.latex(r"T_{ad} = T_0 + \frac{-\Delta H_{comb}}{\sum n_i \cdot \overline{Cp_i}}")
+                
+                st.write("\n**Limitações do modelo:**")
+                st.warning("""
+                ⚠️ Este cálculo **NÃO considera dissociação molecular** em altas temperaturas.
+                
+                A temperatura real de chama é **significativamente menor** devido a:
+                - Dissociação de CO₂ → CO + ½O₂ (absorve calor)
+                - Dissociação de H₂O → H₂ + ½O₂ (absorve calor)
+                - Dissociação de N₂ → 2N (absorve calor)
+                
+                Para combustíveis comuns, a temperatura real é cerca de **2000-3000 K** menor.
+                """)
+            
+            st.divider()
+        
+        # INFORMAÇÕES SOBRE AR
         st.markdown("### ➡️ Informações sobre o Ar")
         
         col_ar1, col_ar2, col_ar3, col_ar4 = st.columns(4)
@@ -270,6 +514,7 @@ if st.session_state.mostrar_esteq:
                 )
         st.divider()
         
+        # RESUMO DOS PARÂMETROS DE COMBUSTÃO
         st.markdown("### 📊 Resumo dos Parâmetros de Combustão")
         
         col_res1, col_res2, col_res3, col_res4 = st.columns(4)
@@ -286,7 +531,7 @@ if st.session_state.mostrar_esteq:
         with col_res3:
             st.metric(
                 label="Razão de Equivalência (Φ)",
-                value=f"{razao_equivalencia:.2f}"
+                value=f"{razao_equivalencia:.4f}"
             )
         with col_res4:
             if razao_equivalencia == 1.0:
@@ -307,8 +552,10 @@ if st.session_state.mostrar_esteq:
                     value="Rica",
                     delta="🔴 Deficiência de ar"
                 )
-        
+
+# =============================================
 # OPÇÃO 2: PODER CALORÍFICO
+# =============================================
 
 if st.session_state.mostrar_calor:
     st.header("🔥 Cálculo do Poder Calorífico")
