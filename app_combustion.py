@@ -169,16 +169,7 @@ if st.session_state.mostrar_esteq:
             "<h2 style='text-align: center;'>Resultados do Balanço Estequiométrico</h2>",
             unsafe_allow_html=True
         )
-        st.divider()
-        
-        # Mostra condição atual
-        if tipo_ar == "Excesso de ar":
-            st.markdown(f"**Condição:** {excesso_valor:.1f}% de excesso de ar")
-        elif tipo_ar == "Deficiência de ar":
-            st.markdown(f"**Condição:** {deficiencia_valor:.1f}% de deficiência de ar")
-        else:
-            st.markdown("**Condição:** Ar teórico")
-            
+                   
         st.divider()
                
         st.markdown("### ➡️ Reação Global Balanceada")
