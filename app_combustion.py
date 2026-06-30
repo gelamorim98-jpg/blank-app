@@ -310,18 +310,8 @@ if st.session_state.mostrar_esteq:
         )
         st.divider()
         
-        # Mostra condição atual
-        if tipo_ar == "Excesso de ar":
-            st.markdown(f"**Condição:** {excesso_valor:.1f}% de excesso de ar")
-        elif tipo_ar == "Deficiência de ar":
-            st.markdown(f"**Condição:** {deficiencia_valor:.1f}% de deficiência de ar")
-        else:
-            st.markdown("**Condição:** Ar teórico")
-            
-        st.divider()
-        
         # RAZÃO DE EQUIVALÊNCIA
-        st.markdown("### ⚖️ Razão de Equivalência (Φ)")
+        st.markdown("### ➡️ Razão de Equivalência (Φ)")
         
         col_phi1, col_phi2, col_phi3 = st.columns([1, 2, 1])
         with col_phi2:
