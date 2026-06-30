@@ -128,9 +128,6 @@ if st.session_state.mostrar_esteq:
                   
                 else:
                     co = 0
-                  
-            else:
-                if carbono_solid == 0 and co > 0 and b == 0:
                                    
         else:
             # Estequiométrico ou excesso de ar
